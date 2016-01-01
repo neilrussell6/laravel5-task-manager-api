@@ -1,17 +1,16 @@
 # vendor directories
-
 /vendor
 /node_modules
 
 # local configuration files
-
 .env
 .env-testing
 
 # IDE files
-
 .idea
 
 # misc local directories
-
 _local
+
+# Codeception
+tests/_output/*
