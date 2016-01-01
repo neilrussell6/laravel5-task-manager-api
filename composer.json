@@ -1,8 +1,8 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
+    "name": "Laravel 5 - Task List",
+    "description": "Laravel 5 Intermediate Task List tutorial. With a few extras.",
     "keywords": ["framework", "laravel"],
-    "license": "MIT",
+    "license": "GNU v2",
     "type": "project",
     "require": {
         "php": ">=5.5.9",
