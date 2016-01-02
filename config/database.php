@@ -48,16 +48,17 @@ return [
 
         'sqlite' => [
             'driver'   => 'sqlite',
-            'database' => database_path(env('DB_SQLITE_DATABASE', 'database.sqlite')),
+            'database' => storage_path(env('DB_SQLITE_DATABASE', 'database.sqlite')),
+//            'database' => ':memory:', // can't get this to work artisan migrate
             'prefix'   => '',
         ],
 
         'mysql' => [
             'driver'    => 'mysql',
-            'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'forge'),
-            'username'  => env('DB_USERNAME', 'forge'),
-            'password'  => env('DB_PASSWORD', ''),
+            'host'      => env('DB_MYSQL_HOST', 'localhost'),
+            'database'  => env('DB_MYSQL_DATABASE', 'forge'),
+            'username'  => env('DB_MYSQL_USERNAME', 'forge'),
+            'password'  => env('DB_MYSQL_PASSWORD', ''),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
@@ -66,10 +67,10 @@ return [
 
         'pgsql' => [
             'driver'   => 'pgsql',
-            'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host'     => env('DB_PGSQL_HOST', 'localhost'),
+            'database' => env('DB_PGSQL_DATABASE', 'forge'),
+            'username' => env('DB_PGSQL_USERNAME', 'forge'),
+            'password' => env('DB_PGSQL_PASSWORD', ''),
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
@@ -77,10 +78,10 @@ return [
 
         'sqlsrv' => [
             'driver'   => 'sqlsrv',
-            'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'host'     => env('DB_SQL_HOST', 'localhost'),
+            'database' => env('DB_SQL_DATABASE', 'forge'),
+            'username' => env('DB_SQL_USERNAME', 'forge'),
+            'password' => env('DB_SQL_PASSWORD', ''),
             'charset'  => 'utf8',
             'prefix'   => '',
         ],
