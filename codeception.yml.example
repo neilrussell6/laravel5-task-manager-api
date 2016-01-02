@@ -12,10 +12,8 @@ settings:
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
-modules:
-#    config:
-#        Db:
-#            dsn: ''
-#            user: ''
-#            password: ''
-#            dump: tests/_data/dump.sql
+        - NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension
+    config:
+        NeilRussell6\CodeceptionLaravel5Extension\ArtisanMigrateExtension:
+            db_connection: sqlite
+            db_sqlite_path: storage/testing/database_testing.sqlite

@@ -25,9 +25,9 @@
         }
     },
     "autoload-dev": {
-        "classmap": [
-            "tests/TestCase.php"
-        ]
+        "psr-4": {
+            "NeilRussell6\\CodeceptionLaravel5Extensions\\": "packages/neilrussell6/codeception-laravel5-extensions/src"
+        }
     },
     "scripts": {
         "post-root-package-install": [
