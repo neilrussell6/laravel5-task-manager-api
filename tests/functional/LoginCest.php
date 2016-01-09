@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
 use App\User;
 
 class LoginCest
@@ -21,8 +20,6 @@ class LoginCest
 
     public function _before(FunctionalTester $I)
     {
-        Artisan::call('migrate:reset');
-        Artisan::call('migrate');
         // given ... I am on login page
         $I->amOnPage('login');
     }
