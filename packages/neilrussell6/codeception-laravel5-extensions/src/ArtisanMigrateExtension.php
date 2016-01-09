@@ -11,7 +11,7 @@ use \Illuminate\Support\Facades\Artisan;
 class ArtisanMigrateExtension extends Extension
 {
     public $connection_key      = 'DB_CONNECTION';
-    public $connection          = 'sqlite_testing';
+    public $connection          = 'sqlite';
     public $sqlite_path         = 'storage/database_testing.sqlite';
     public $migrate             = true;
 

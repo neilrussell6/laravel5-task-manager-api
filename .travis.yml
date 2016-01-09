@@ -5,7 +5,12 @@ php:
 
 before_script:
 # copy env files
-  - cp .env-testing.example .env
+  - cp .env-testing.example .env-testing
+# copy codeception files
+  - cp codeception.yml.example codeception.yml
+  - cp tests/acceptance.suite.yml.example acceptance.suite.yml
+  - cp tests/functional.suite.yml.example functional.suite.yml
+  - cp tests/unit.suite.yml.example unit.suite.yml
 # composer
   - composer self-update
   - composer install --no-interaction
