@@ -14,6 +14,6 @@ extensions:
         - Codeception\Extension\RunFailed
         - NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension
     config:
-        NeilRussell6\CodeceptionLaravel5Extension\ArtisanMigrateExtension:
+        NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension:
             db_connection: sqlite
             db_sqlite_path: storage/testing/database_testing.sqlite
