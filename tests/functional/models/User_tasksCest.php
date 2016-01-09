@@ -68,42 +68,67 @@ class User_tasksCest
     | Notes
     |--------------------------------------------------------------------------
     |
-    | The following tests are not strictly necessary during actual development,
-    | they are here purely to demo some useful eloquent techniques.
+    | Because the following test core Eloquent behaviour, they are not strictly
+    | necessary during actual development. They are here purely to demo some
+    | useful eloquent techniques.
     |
     */
 
     /** @test */
-    public function calling_with_tasks_on_user_model_should_eager_load_all_tasks_for_all_users(FunctionalTester $I)
+    public function demo_inefficient_eloquent_relationship_query(FunctionalTester $I)
     {
         // given ... 2 users, each with their own tasks
-        $I->assertSame(2, User::count());
 
-        // when ... we call "with tasks" get on the User model
+        // when ... we get all users
+        $users = User::all();
+        $I->assertSame(2, count($users));
+
+        //      ... and loop through them, calling the tasks method on each user without either of the eager loading methods ("with" or "load")
+        //          it would result in a new SQL query for each user's tasks (which is inefficient, especially for large data sets, so use eager loading instead)
+        $user_tasks = [];
+        foreach ($users as $user) {
+            $_user_tasks = $user->tasks()->get();
+            array_push($user_tasks, $_user_tasks);
+        }
+
+        // then ... should have 2 tasks for user1 & 1 for user2
+        $I->assertSame(2, count($user_tasks[0])); // user1's tasks
+        $I->assertSame(1, count($user_tasks[1])); // user2's tasks
+    }
+
+    /** @test */
+    public function demo_efficient_eager_loading_eloquent_relationship_query(FunctionalTester $I)
+    {
+        // given ... 2 users, each with their own tasks
+
+        // when ... we get users "with" their tasks
+        //          it would result in only 2 SQL queries in total (which is efficient)
         $users = User::with('tasks')->get();
 
-        // then ... return all users with their tasks
+        // then ... should return all users with their tasks
         $I->assertSame(2, count($users));
-        $I->assertSame(2, count($users[0]->tasks));
-        $I->assertSame(1, count($users[1]->tasks));
+        $I->assertSame(2, count($users[0]->tasks)); // user 1
+        $I->assertSame(1, count($users[1]->tasks)); // user 2
+    }
 
-        // or when ... we use the lazy loading version to achieve the same thing
-        $users = User::all();
-        $users->load('tasks'); // this allows us to conditionally load the tasks after load the users, both approaches result in only 2 SQL queries
+    /** @test */
+    public function demo_efficient_lazy_eager_loading_eloquent_relationship_query(FunctionalTester $I)
+    {
+        // given ... 2 users, each with their own tasks
 
-        // then ... should get the same results
-        $I->assertSame(2, count($users));
-        $I->assertSame(2, count($users[0]->tasks));
-        $I->assertSame(1, count($users[1]->tasks));
-
-        // lastly ... if we loaded all users using:
+        // when ... we get all users
         $users = User::all();
 
-        // then ... looped through the users and called the tasks method on each one, without either of the eager loading methods ("with" or "load"):
-        //          it would result in a new SQL query for each user (which is inefficient, especially for large data sets, so use eager loading instead)
-        foreach ($users as $user) {
-            $tasks = $user->tasks();
-            $I->assertGreaterThan(0, count($tasks));
-        }
+        // then ... should return all users
+        $I->assertSame(2, count($users));
+
+        // when ... we then "load" tasks for all users
+        //          it would still result in only 2 SQL queries in total (which is efficient)
+        //          this achieves lazy version of previous test, which allows us to conditionally load user's tasks after loading all users
+        $users->load('tasks');
+
+        // then ... should attach each user's tasks
+        $I->assertSame(2, count($users[0]->tasks)); // user 1
+        $I->assertSame(1, count($users[1]->tasks)); // user 2
     }
 }
