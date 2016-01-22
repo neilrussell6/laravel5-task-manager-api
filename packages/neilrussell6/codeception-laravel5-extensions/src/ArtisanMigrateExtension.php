@@ -4,6 +4,7 @@ use \Codeception\Event\SuiteEvent;
 use \Codeception\Event\TestEvent;
 use \Codeception\Platform\Extension;
 use \Illuminate\Support\Facades\Artisan;
+
 /**
  * Class ArtisanMigrateExtension
  * @package NeilRussell6\CodeceptionLaravel5Extensions
@@ -15,65 +16,71 @@ class ArtisanMigrateExtension extends Extension
     public $sqlite_path         = 'storage/database_testing.sqlite';
     public $migrate             = true;
 
-    // event listeners
+    /*
+    |--------------------------------------------------------------------------
+    | Event Listeners
+    |--------------------------------------------------------------------------
+    |
+    */
 
     public static $events = [
-        'suite.before' => 'beforeSuite',
         'test.before' => 'beforeTest'
     ];
 
-    // event handlers
+    /*
+    |--------------------------------------------------------------------------
+    | Event Handlers
+    |--------------------------------------------------------------------------
+    |
+    */
 
-    public function beforeSuite(SuiteEvent $e) {
-
-        // get config
-        if ( array_key_exists('db_connection_key', $this->config) ) {
-            $this->connection_key = $this->config['db_connection_key'];
-        }
-        if ( array_key_exists('db_connection', $this->config) ) {
-            $this->connection = $this->config['db_connection'];
-        }
-        if ( array_key_exists('db_sqlite_path', $this->config) ) {
-            $this->sqlite_path = $this->config['db_sqlite_path'];
-        }
-        if ( array_key_exists('migrate', $this->config) ) {
-            $this->migrate = $this->config['migrate'];
-        }
-
-        // create DB connection env string
-        $env_str = $this->connection_key . "=" . $this->connection;
-
-        // set DB connection env
-        putenv( $env_str );
-
-        // create sqlite file directory if it doesn't exist
-        if( !file_exists( dirname($this->sqlite_path) ) ) {
-            mkdir( dirname(  $this->sqlite_path ), 0777, true );
-        }
-
-        // create sqlite file if it doesn't exist
-        if( !file_exists( $this->sqlite_path ) ) {
-            touch( $this->sqlite_path );
-        }
-    }
-
+    /**
+     * before each test runs
+     *
+     * @param TestEvent $e
+     * @return bool
+     */
     public function beforeTest(TestEvent $e) {
 
-        if ( !$this->migrate ) {
-            return;
+        // if using sqlite
+
+        if ( env('DB_CONNECTION') === "sqlite" ) {
+
+            $sqlite_db_path = storage_path( env('DB_SQLITE_DATABASE'));
+
+            // ... create sqlite file directory if it doesn't exist
+
+            if( !file_exists( dirname( $sqlite_db_path ) ) ) {
+                mkdir( dirname( $sqlite_db_path ), 0777, true );
+            }
+
+            // ... and create sqlite file if it doesn't exist
+
+            if( !file_exists( $sqlite_db_path ) ) {
+                touch( $sqlite_db_path );
+            }
         }
+
+        // get current migration status
 
         Artisan::call('migrate:status', ['--database' => $this->connection]);
         $status = Artisan::output();
+//        var_dump($status);
+
+        // ... if no migrations the run migrate
 
         if ( str_contains( $status, "No migrations found") ) {
             Artisan::call('migrate', ['--database' => $this->connection]);
 //            $result = Artisan::output();
-        } else {
-            Artisan::call('migrate:refresh', ['--database' => $this->connection]);
-//            $result = Artisan::output();
+//            var_dump($result);die();
+            return true;
         }
+
+        // ... if migrations already exist then run migrate:refresh
+
+        Artisan::call('migrate:refresh', ['--database' => $this->connection]);
+//        $result = Artisan::output();
+//        var_dump($result);die();
     }
 }
 ?>
-
