@@ -37,7 +37,7 @@ cp tests/unit.suite.yml.example unit.suite.yml
 
 #### Update local config files
 
-This may include:
+This usually includes:
 
 **.env & .env-testing**
 ```
@@ -53,28 +53,14 @@ MAIL_DRIVER
 
 **.codeception.yml**
 
-NOTE: 
-**db_connection** must match **DB_CONNECTION** in .env-testing
-**db_sqlite_path** must match **DB_SQLITE_DATABASE** in .env-testing
+Config for NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension extension:
+ * **db_connection** must match **DB_CONNECTION** in .env-testing
+ * **db_sqlite_path** must match **DB_SQLITE_DATABASE** in .env-testing
 
-```yml
-extensions:
-    config:
-        NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension:
-            db_connection: sqlite # must match .env-testing 
-            db_sqlite_path: storage/testing/tt_task_list_testing.sqlite
-```
 
 ## Running Tests
 
-Codeception build
-
 ```bash
 ./vendor/bin/codecept build
-```
-
-Then Codeception run
-
-```bash
 ./vendor/bin/codecept run
 ```

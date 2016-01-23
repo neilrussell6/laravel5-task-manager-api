@@ -15,5 +15,5 @@ extensions:
         - NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension
     config:
         NeilRussell6\CodeceptionLaravel5Extensions\ArtisanMigrateExtension:
-            db_connection: sqlite
-            db_sqlite_path: storage/testing/database_testing.sqlite
+            db_connection: sqlite # must match DB_CONNECTION in .env-testing
+            db_sqlite_path: storage/testing/database_testing.sqlite # must match DB_SQLITE_DATABASE in .env-testing
