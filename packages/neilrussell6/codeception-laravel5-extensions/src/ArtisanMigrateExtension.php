@@ -2,6 +2,7 @@
 
 use \Codeception\Event\SuiteEvent;
 use \Codeception\Event\TestEvent;
+use Codeception\Lib\Console\Output;
 use \Codeception\Platform\Extension;
 use \Illuminate\Support\Facades\Artisan;
 
@@ -67,37 +68,41 @@ class ArtisanMigrateExtension extends Extension
 
     /**
      * before each test runs
-     * here we migrate if no migration and reset if migration already run or if no transaction mode
-     * TODO: not working, figure out why sometime (ERROR: no such table: users in routing/RegisterCest)
+     * here we migrate if no migration and reset if migration already run
+     * TODO: This is not working when Laravel5 transaction mode (cleanup=true in config) is activated, figure out why (eg error: no such table: users in routing/RegisterCest)
      *
      * @param TestEvent $e
      * @return bool
      */
     public function beforeTest(TestEvent $e) {
 
-        // get laravel5 module
+        // instantiate Codeception console output
+        $output = new Output([]);
 
+        // get laravel5 module
         $l5 = $this->getModule('Laravel5');
 
-        // get current migration status
+        // disable transaction mode for tests (this extension does not work with Laravel 5 transaction mode) TODO: figure out why
+        if ( $l5->config['cleanup'] ) {
+            $output->writeln("\n\e[41m" . "Please set Laravel5 Codeception module's cleanup to false (in tests/functional.suite.yml) before using NeilRussell6\\CodeceptionLaravel5Extensions\\ArtisanMigrateExtension." . "\e[0m");
+            die();
+        }
 
+        // get current migration status
         Artisan::call('migrate:status', ['--database' => $this->connection]);
         $status = Artisan::output();
         //var_dump($status);
 
         // ... if no migrations the run migrate
-
         if ( str_contains( $status, "No migrations found") ) {
 
             Artisan::call('migrate', ['--database' => $this->connection]);
             //$result = Artisan::output();
+            //var_dump($result);
         }
 
-        // ... if migrations already exist and either:
-        // ... a) we are not using the Laravel5 module
-        // ... b) we are not using transaction mode (cleanup in Laravel5 config)
-
-        else if ( !$this->hasModule('Laravel5') || !$l5->config['cleanup'] ) {
+        // ... else if migrations already exist
+        else {
 
             Artisan::call('migrate:refresh', ['--database' => $this->connection]);
             //$result = Artisan::output();
