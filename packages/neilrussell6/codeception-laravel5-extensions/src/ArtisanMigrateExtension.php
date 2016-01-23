@@ -11,10 +11,8 @@ use \Illuminate\Support\Facades\Artisan;
  */
 class ArtisanMigrateExtension extends Extension
 {
-    public $connection_key      = 'DB_CONNECTION';
     public $connection          = 'sqlite';
     public $sqlite_path         = 'storage/database_testing.sqlite';
-    public $migrate             = true;
 
     /*
     |--------------------------------------------------------------------------
@@ -24,7 +22,8 @@ class ArtisanMigrateExtension extends Extension
     */
 
     public static $events = [
-        'test.before' => 'beforeTest'
+        'suite.before' => 'beforeSuite',
+        'test.before' => 'beforeTest',
     ];
 
     /*
@@ -33,20 +32,22 @@ class ArtisanMigrateExtension extends Extension
     |--------------------------------------------------------------------------
     |
     */
+    public function beforeSuite(SuiteEvent $e)
+    {
+        // get config
 
-    /**
-     * before each test runs
-     *
-     * @param TestEvent $e
-     * @return bool
-     */
-    public function beforeTest(TestEvent $e) {
+        if ( array_key_exists('db_connection', $this->config) ) {
+            $this->connection = $this->config['db_connection'];
+        }
+        if ( array_key_exists('db_sqlite_path', $this->config) ) {
+            $this->sqlite_path = $this->config['db_sqlite_path'];
+        }
 
         // if using sqlite
 
-        if ( env('DB_CONNECTION') === "sqlite" ) {
+        if ( $this->connection === "sqlite" ) {
 
-            $sqlite_db_path = storage_path( env('DB_SQLITE_DATABASE'));
+            $sqlite_db_path = $this->sqlite_path;
 
             // ... create sqlite file directory if it doesn't exist
 
@@ -61,26 +62,47 @@ class ArtisanMigrateExtension extends Extension
             }
         }
 
+        putenv( 'DB_CONNECTION=' . $this->connection );
+    }
+
+    /**
+     * before each test runs
+     * here we migrate if no migration and reset if migration already run or if no transaction mode
+     * TODO: not working, figure out why sometime (ERROR: no such table: users in routing/RegisterCest)
+     *
+     * @param TestEvent $e
+     * @return bool
+     */
+    public function beforeTest(TestEvent $e) {
+
+        // get laravel5 module
+
+        $l5 = $this->getModule('Laravel5');
+
         // get current migration status
 
         Artisan::call('migrate:status', ['--database' => $this->connection]);
         $status = Artisan::output();
-//        var_dump($status);
+        //var_dump($status);
 
         // ... if no migrations the run migrate
 
         if ( str_contains( $status, "No migrations found") ) {
+
             Artisan::call('migrate', ['--database' => $this->connection]);
-//            $result = Artisan::output();
-//            var_dump($result);die();
-            return true;
+            //$result = Artisan::output();
         }
 
-        // ... if migrations already exist then run migrate:refresh
+        // ... if migrations already exist and either:
+        // ... a) we are not using the Laravel5 module
+        // ... b) we are not using transaction mode (cleanup in Laravel5 config)
 
-        Artisan::call('migrate:refresh', ['--database' => $this->connection]);
-//        $result = Artisan::output();
-//        var_dump($result);die();
+        else if ( !$this->hasModule('Laravel5') || !$l5->config['cleanup'] ) {
+
+            Artisan::call('migrate:refresh', ['--database' => $this->connection]);
+            //$result = Artisan::output();
+            //var_dump($result);
+        }
     }
 }
 ?>

@@ -12,7 +12,7 @@ modules:
         - Asserts
         - Laravel5:
             environment_file: .env-testing
-            cleanup: true # run tests in transaction mode
+            cleanup: false # run tests in transaction mode
 #        - Db:
 #            dsn: 'mysql:host=localhost;dbname=tt_task_list_testing'
 #            user: 'homestead'

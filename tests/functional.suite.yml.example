@@ -12,4 +12,4 @@ modules:
         - Asserts
         - Laravel5:
             environment_file: .env-testing
-            cleanup: true # run tests in transaction mode
+            cleanup: false # run tests in transaction mode
