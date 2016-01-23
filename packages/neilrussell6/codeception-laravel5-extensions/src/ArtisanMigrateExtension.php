@@ -82,7 +82,7 @@ class ArtisanMigrateExtension extends Extension
         // get laravel5 module
         $l5 = $this->getModule('Laravel5');
 
-        // disable transaction mode for tests (this extension does not work with Laravel 5 transaction mode) TODO: figure out why
+        // output error and die if transaction mode is active (this extension does not work with Laravel 5 transaction mode) TODO: figure out why
         if ( $l5->config['cleanup'] ) {
             $output->writeln("\n\e[41m" . "Please set Laravel5 Codeception module's cleanup to false (in tests/functional.suite.yml) before using NeilRussell6\\CodeceptionLaravel5Extensions\\ArtisanMigrateExtension." . "\e[0m");
             die();
