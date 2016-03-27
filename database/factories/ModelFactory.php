@@ -15,14 +15,14 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->email,
-        'password' => bcrypt(str_random(10)),
+        'password' => bcrypt(123),//bcrypt(str_random(10)),
         'remember_token' => str_random(10),
     ];
 });
 
 $factory->define(App\Task::class, function (Faker\Generator $faker) {
     return [
-        'name' => $faker->name,
+        'name' => $faker->realText(50),
         'user_id' => 1,
     ];
 });
