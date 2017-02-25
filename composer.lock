@@ -634,12 +634,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/neilrussell6/laravel5-json-api.git",
-                "reference": "ebc82183402ee51d3645c82b69cf21be924ef400"
+                "reference": "8f1e745c78b2ffc17e064a64190588b8fd93c845"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neilrussell6/laravel5-json-api/zipball/ebc82183402ee51d3645c82b69cf21be924ef400",
-                "reference": "ebc82183402ee51d3645c82b69cf21be924ef400",
+                "url": "https://api.github.com/repos/neilrussell6/laravel5-json-api/zipball/8f1e745c78b2ffc17e064a64190588b8fd93c845",
+                "reference": "8f1e745c78b2ffc17e064a64190588b8fd93c845",
                 "shasum": ""
             },
             "require": {
@@ -656,7 +656,7 @@
             "autoload": {
                 "psr-4": {
                     "Neilrussell6\\Laravel5JsonApi\\": "src/",
-                    "Neilrussell6\\Laravel5JsonApi\\Testing\\": "src-testing/"
+                    "Neilrussell6\\Laravel5JsonApi\\Seeds\\": "src-testing/database/seeds/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -674,7 +674,7 @@
                 "laravel jsonapi",
                 "laravel rest api"
             ],
-            "time": "2017-02-25 10:00:10"
+            "time": "2017-02-25 11:19:42"
         },
         {
             "name": "nesbot/carbon",
