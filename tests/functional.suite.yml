@@ -7,17 +7,5 @@
 class_name: FunctionalTester
 modules:
     enabled:
-        - \Helper\Functional
-        - Filesystem
         - Asserts
-        - Laravel5:
-            environment_file: .env-testing
-            cleanup: false # run tests in transaction mode
-#        - Db:
-#            dsn: 'mysql:host=localhost;dbname=tt_task_list_testing'
-#            user: 'homestead'
-#            password: 'secret'
-#            dump: 'tests/_data/functional.sql'
-#            populate: true # whether the the dump should be loaded before the test suite is started
-#            cleanup: false # whether the dump should be reloaded after each test
-#            reconnect: false # whether the module should reconnect to the database before each test
+        - \Helper\Functional

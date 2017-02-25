@@ -1,22 +1,25 @@
-# vendor directories
-/vendor
-/node_modules
-
-# local configuration files
-.env
-.env-testing
-
-# IDE files
-.idea
-
-# misc local directories
-_local
-
-# Codeception
+# codeception
 tests/_output/*
-tests/_support/_generated/*
+tests/_support/_generated
+tests/api.suite.yml
 tests/acceptance.suite.yml
-tests/functional.suite.yml
-tests/unit.suite.yml
-codeception.yml
-storage/testing
+storage/*.sqlite
+storage/*.sqlite-journal
+
+# IDE
+/.idea
+
+# laravel
+/public/storage
+/public/hot
+/storage/*.key
+Homestead.json
+Homestead.yaml
+.env
+.env.testing
+
+# misc
+_ignore
+
+# package managers
+/vendor
