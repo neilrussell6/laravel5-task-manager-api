@@ -11,7 +11,7 @@ class Controller extends JsonApiController
 
     const PAGINATION_LIMIT = 100;
 
-    protected $model;
+    protected $model = null;
 
     public $messages = [
         'required' => 'The :attribute field is required.',
@@ -24,8 +24,10 @@ class Controller extends JsonApiController
      * Controller constructor.
      * @param $model
      */
-    public function __construct ($model)
+    public function __construct ($model = null)
     {
-        $this->model = new $model();
+        if (!is_null($model)) {
+            $this->model = new $model();
+        }
     }
 }

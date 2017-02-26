@@ -145,6 +145,7 @@ return [
         Illuminate\Bus\BusServiceProvider::class,
         Illuminate\Cache\CacheServiceProvider::class,
         Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+        Illuminate\Cookie\CookieServiceProvider::class,
         Illuminate\Database\DatabaseServiceProvider::class,
         Illuminate\Encryption\EncryptionServiceProvider::class,
         Illuminate\Filesystem\FilesystemServiceProvider::class,
@@ -156,6 +157,8 @@ return [
         Illuminate\Pipeline\PipelineServiceProvider::class,
         Illuminate\Queue\QueueServiceProvider::class,
         Illuminate\Redis\RedisServiceProvider::class,
+        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+        Illuminate\Session\SessionServiceProvider::class,
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
@@ -174,9 +177,14 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         /*
-         * Custom Packages Service Providers...
+         * 3rd Party Packages Service Providers...
          */
-        Neilrussell6\Laravel5JsonApi\Providers\Laravel5JsonApiServiceProvider::class
+        \Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+
+        /*
+         * Neilrussell6 Packages Service Providers...
+         */
+        Neilrussell6\Laravel5JsonApi\Providers\Laravel5JsonApiServiceProvider::class,
     ],
 
     /*
@@ -199,6 +207,7 @@ return [
         'Bus' => Illuminate\Support\Facades\Bus::class,
         'Cache' => Illuminate\Support\Facades\Cache::class,
         'Config' => Illuminate\Support\Facades\Config::class,
+        'Cookie' => Illuminate\Support\Facades\Cookie::class,
         'Crypt' => Illuminate\Support\Facades\Crypt::class,
         'DB' => Illuminate\Support\Facades\DB::class,
         'Eloquent' => Illuminate\Database\Eloquent\Model::class,
@@ -210,6 +219,7 @@ return [
         'Log' => Illuminate\Support\Facades\Log::class,
         'Mail' => Illuminate\Support\Facades\Mail::class,
         'Notification' => Illuminate\Support\Facades\Notification::class,
+        'Password' => Illuminate\Support\Facades\Password::class,
         'Queue' => Illuminate\Support\Facades\Queue::class,
         'Redirect' => Illuminate\Support\Facades\Redirect::class,
         'Redis' => Illuminate\Support\Facades\Redis::class,
@@ -217,15 +227,22 @@ return [
         'Response' => Illuminate\Support\Facades\Response::class,
         'Route' => Illuminate\Support\Facades\Route::class,
         'Schema' => Illuminate\Support\Facades\Schema::class,
+        'Session' => Illuminate\Support\Facades\Session::class,
         'Storage' => Illuminate\Support\Facades\Storage::class,
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
         /*
-         * Custom Facades...
+         * 3rd Party Facades...
          */
-        'JsonApiUtils' => \Neilrussell6\Laravel5JsonApi\Facades\JsonApiUtils::class
+        'JWTAuth' => \Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTAuth' => \Tymon\JWTAuth\Facades\JWTFactory::class,
+
+        /*
+         * Neilrussell6 Facades...
+         */
+        'JsonApiUtils' => \Neilrussell6\Laravel5JsonApi\Facades\JsonApiUtils::class,
     ],
 
 ];

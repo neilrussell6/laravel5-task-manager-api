@@ -20,7 +20,8 @@
     "php": ">=5.6.4",
     "laravel/framework": "5.4.*",
     "laravel/tinker": "~1.0",
-    "neilrussell6/laravel5-json-api": "dev-master"
+    "neilrussell6/laravel5-json-api": "dev-master",
+    "tymon/jwt-auth": "^0.5.10"
   },
   "require-dev": {
     "codeception/codeception": "^2.2",

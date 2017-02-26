@@ -9,6 +9,13 @@ Fixtures::add('unknown', [
     ]
 ]);
 
+Fixtures::add('credentials', [
+    'data' => [
+        'type' => 'access_tokens',
+        'attributes' => []
+    ]
+]);
+
 Fixtures::add('user', [
     'data' => [
         'type' => 'users',

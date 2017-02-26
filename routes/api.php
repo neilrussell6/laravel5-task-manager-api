@@ -17,6 +17,10 @@ Route::group(['middleware' => ['api'], 'namespace' => 'Api'], function () {
 
     Route::get('', 'ApiController@index');
 
+    // access tokens
+
+    Route::post('access_tokens', [ 'as' => 'access_tokens.create', 'uses' => 'AccessTokensController@create' ]);
+
     // primary resources
 
     Route::resource('users', 'UsersController', ['except' => ['destroy', 'edit']]);

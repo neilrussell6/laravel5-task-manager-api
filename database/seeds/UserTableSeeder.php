@@ -16,7 +16,7 @@ class UserTableSeeder extends Seeder
         DB::table('users')->insert([
             'name' => 'Administrator',
             'email' => env('ADMIN_EMAIL'),
-            'password' => bcrypt('ADMIN_PASSWORD')
+            'password' => bcrypt(env('ADMIN_PASSWORD'))
         ]);
         factory(User::class, 10)->create();
     }
