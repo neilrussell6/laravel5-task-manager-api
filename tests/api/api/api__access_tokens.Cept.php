@@ -13,6 +13,10 @@ $I = new ApiTester($scenario);
 //
 ///////////////////////////////////////////////////////
 
+// ====================================================
+// create data
+// ====================================================
+
 $I->comment("given 1 user");
 $email = "aaa@bbb.ccc";
 $password = "abcABC123!";
@@ -22,6 +26,13 @@ factory(User::class, 1)->create([
 ]);
 $I->assertCount(1, User::all());
 
+// ====================================================
+// set headers
+// ====================================================
+
+$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
+$I->haveHttpHeader('Accept', 'application/vnd.api+json');
+
 ///////////////////////////////////////////////////////
 //
 // Test
@@ -29,9 +40,6 @@ $I->assertCount(1, User::all());
 // * access tokens
 //
 ///////////////////////////////////////////////////////
-
-$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
-$I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 // ====================================================
 // create access token (success)

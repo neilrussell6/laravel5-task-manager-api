@@ -1,6 +1,5 @@
 <?php
 
-use \Mockery as m;
 use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
@@ -37,31 +36,26 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 //
 // Test
 //
-// * access tokens (exceptions)
+// * authentication
 //
 ///////////////////////////////////////////////////////
 
 // ====================================================
-// create access token (JWT Exception)
+// Authorization header
 // ====================================================
-
-\Tymon\JWTAuth\Facades\JWTAuth::shouldReceive('attempt')->andThrow(new \Tymon\JWTAuth\Exceptions\JWTException());
 
 $credentials = Fixtures::get('credentials');
 $credentials['data']['attributes']['email'] = $email;
 $credentials['data']['attributes']['password'] = $password;
 
-$I->comment("when we create an access token, and there is an error creating the access token");
 $I->sendPOST('/api/access_tokens', $credentials);
+$access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];
 
-$I->expect("should return 500 HTTP code");
-$I->seeResponseCodeIs(HttpCode::INTERNAL_SERVER_ERROR);
+// ----------------------------------------------------
 
-$I->expect("should respond with the following structure");
-$I->seeResponseJsonPathType('$.errors', 'array:!empty');
-$I->seeResponseJsonPathSame('$.errors[*].status', 500);
-$I->seeResponseJsonPathType('$.errors[*].detail', 'string:!empty');
-$I->seeResponseJsonPathType('$.errors[*].title', 'string:!empty');
+$I->comment("when we make a with a valid Authorization header");
+$I->haveHttpHeader('Authorization', "Bearer {$access_token}");
+$I->sendGET('/api/users');
 
-$I->expect("should not return an access token");
-$I->seeNotResponseJsonPath('$.data.attributes.access_token');
+$I->expect("should return 200 HTTP code");
+$I->seeResponseCodeIs(HttpCode::OK);

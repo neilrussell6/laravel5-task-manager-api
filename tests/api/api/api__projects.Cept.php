@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Project;
+use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
 
@@ -12,9 +13,38 @@ $I = new ApiTester($scenario);
 //
 ///////////////////////////////////////////////////////
 
+// ====================================================
+// create data
+// ====================================================
+
+$I->comment("given 1 auth user");
+$email = "aaa@bbb.ccc";
+$password = "abcABC123!";
+factory(User::class, 1)->create([
+    'email' => $email,
+    'password' => \Illuminate\Support\Facades\Hash::make($password),
+]);
+$I->assertCount(1, User::all());
+
 $I->comment("given 2 projects");
 factory(Project::class, 2)->create();
 $I->assertSame(2, Project::all()->count());
+
+// ====================================================
+// authenticate user and set headers
+// ====================================================
+
+$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
+$I->haveHttpHeader('Accept', 'application/vnd.api+json');
+
+$credentials = Fixtures::get('credentials');
+$credentials['data']['attributes']['email'] = $email;
+$credentials['data']['attributes']['password'] = $password;
+
+$I->sendPOST('/api/access_tokens', $credentials);
+$access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];
+
+$I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 
 ///////////////////////////////////////////////////////
 //
@@ -23,9 +53,6 @@ $I->assertSame(2, Project::all()->count());
 // * projects
 //
 ///////////////////////////////////////////////////////
-
-$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
-$I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 // ====================================================
 // index projects

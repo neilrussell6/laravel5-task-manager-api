@@ -12,9 +12,38 @@ $I = new ApiTester($scenario);
 //
 ///////////////////////////////////////////////////////
 
-$I->comment("given 2 users");
-factory(User::class, 2)->create();
+// ====================================================
+// create data
+// ====================================================
+
+$I->comment("given 1 auth user");
+$email = "aaa@bbb.ccc";
+$password = "abcABC123!";
+factory(User::class, 1)->create([
+    'email' => $email,
+    'password' => \Illuminate\Support\Facades\Hash::make($password),
+]);
+
+$I->comment("given 1 other user");
+factory(User::class, 1)->create();
+
 $I->assertSame(2, User::all()->count());
+
+// ====================================================
+// authenticate user and set headers
+// ====================================================
+
+$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
+$I->haveHttpHeader('Accept', 'application/vnd.api+json');
+
+$credentials = Fixtures::get('credentials');
+$credentials['data']['attributes']['email'] = $email;
+$credentials['data']['attributes']['password'] = $password;
+
+$I->sendPOST('/api/access_tokens', $credentials);
+$access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];
+
+$I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 
 ///////////////////////////////////////////////////////
 //
@@ -23,9 +52,6 @@ $I->assertSame(2, User::all()->count());
 // * users
 //
 ///////////////////////////////////////////////////////
-
-$I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
-$I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 // ====================================================
 // index users

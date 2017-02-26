@@ -28,8 +28,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \Neilrussell6\Laravel5JsonApi\Http\Middleware\BuildJsonApiResponse::class,
-        \Neilrussell6\Laravel5JsonApi\Http\Middleware\ValidateJsonApiRequest::class,
+
     ];
 
     /**
@@ -42,5 +41,9 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'jsonapi' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\JsonApi::class,
+        'jsonapi.jwt' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\TransformJWTResponse::class,
+        'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
+        'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
     ];
 }
