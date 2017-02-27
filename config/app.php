@@ -179,7 +179,8 @@ return [
         /*
          * 3rd Party Packages Service Providers...
          */
-        \Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
+        Kodeine\Acl\AclServiceProvider::class,
 
         /*
          * Neilrussell6 Packages Service Providers...
@@ -200,9 +201,11 @@ return [
 
     'aliases' => [
 
+
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
+        'Blade' => Illuminate\Support\Facades\Blade::class,
         'Broadcast' => Illuminate\Support\Facades\Broadcast::class,
         'Bus' => Illuminate\Support\Facades\Bus::class,
         'Cache' => Illuminate\Support\Facades\Cache::class,

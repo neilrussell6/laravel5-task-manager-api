@@ -1,8 +1,11 @@
 <?php namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Neilrussell6\Laravel5JsonApi\Http\Controllers\JsonApiController;
 
 class Controller extends JsonApiController
@@ -30,4 +33,14 @@ class Controller extends JsonApiController
             $this->model = new $model();
         }
     }
+
+//    public function update (Request $request, $id)
+//    {
+//        $user = Auth::user();
+//        $record = $this->model->find($id);
+//
+//        if ($user->can('update', $record)) {
+//            //
+//        }
+//    }
 }

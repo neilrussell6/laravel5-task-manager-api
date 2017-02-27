@@ -18,6 +18,8 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.6.4",
+    "doctrine/dbal": "^2.5",
+    "kodeine/laravel-acl": "~1.0@dev",
     "laravel/framework": "5.4.*",
     "laravel/tinker": "~1.0",
     "neilrussell6/laravel5-json-api": "dev-master",

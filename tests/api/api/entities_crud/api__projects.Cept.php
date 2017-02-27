@@ -4,6 +4,7 @@ use App\Models\Project;
 use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
+use Illuminate\Support\Facades\Hash;
 
 $I = new ApiTester($scenario);
 
@@ -22,7 +23,7 @@ $email = "aaa@bbb.ccc";
 $password = "abcABC123!";
 factory(User::class, 1)->create([
     'email' => $email,
-    'password' => \Illuminate\Support\Facades\Hash::make($password),
+    'password' => Hash::make($password),
 ]);
 $I->assertCount(1, User::all());
 
@@ -137,7 +138,7 @@ $I->seeResponseJsonPathType('$.data.attributes', 'array:!empty');
 $I->expect("should not create any new records");
 $I->assertSame(3, Project::all()->count());
 
-$I->expect("should update project one's name");
+$I->expect("should update project's name");
 $I->assertSame("AAABBBCCC", Project::find(3)->name);
 
 // ====================================================

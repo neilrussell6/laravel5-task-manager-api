@@ -3,6 +3,7 @@
 use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
+use Illuminate\Support\Facades\Hash;
 
 $I = new ApiTester($scenario);
 
@@ -21,7 +22,7 @@ $email = "aaa@bbb.ccc";
 $password = "abcABC123!";
 factory(User::class, 1)->create([
     'email' => $email,
-    'password' => \Illuminate\Support\Facades\Hash::make($password),
+    'password' => Hash::make($password),
 ]);
 
 $I->comment("given 1 other user");
@@ -95,17 +96,17 @@ $I->comment("when we create a user");
 $user = Fixtures::get('user');
 $I->sendPOST('/api/users', $user);
 
-$I->expect("should return 201 HTTP code");
-$I->seeResponseCodeIs(HttpCode::CREATED);
+$I->expect("should return 405 HTTP code");
+$I->seeResponseCodeIs(HttpCode::METHOD_NOT_ALLOWED);
 
 $I->expect("should respond with the following structure");
-$I->seeResponseJsonPathRegex('$.links.self', '/^http\:\/\/[^\/]+\/api\/users\/3$/');
-$I->seeResponseJsonPathSame('$.data.id', "3");
-$I->seeResponseJsonPathSame('$.data.type', "users");
-$I->seeResponseJsonPathType('$.data.attributes', 'array:!empty');
+$I->seeResponseJsonPathType('$.errors', 'array:!empty');
+$I->seeResponseJsonPathSame('$.errors[*].status', 405);
+$I->seeResponseJsonPathType('$.errors[*].detail', 'string:!empty');
+$I->seeResponseJsonPathType('$.errors[*].title', 'string:!empty');
 
-$I->expect("should create 1 new record");
-$I->assertSame(3, User::all()->count());
+$I->expect("should not create any records");
+$I->assertSame(2, User::all()->count());
 
 // ====================================================
 // update user
@@ -114,37 +115,36 @@ $I->assertSame(3, User::all()->count());
 $I->comment("when we update a user");
 $user = [
     'data' => [
-        'id' => 3,
+        'id' => 2,
         'type' => 'users',
         'attributes' => [
-            'name' => "AAABBBCCC",
+            'first_name' => "AAABBBCCC",
         ]
     ]
 ];
-
-$I->sendPATCH('/api/users/3', $user);
+$I->sendPATCH('/api/users/2', $user);
 
 $I->expect("should return 200 HTTP code");
 $I->seeResponseCodeIs(HttpCode::OK);
 
 $I->expect("should respond with the following structure");
-$I->seeResponseJsonPathRegex('$.links.self', '/^http\:\/\/[^\/]+\/api\/users\/3$/');
-$I->seeResponseJsonPathSame('$.data.id', "3");
+$I->seeResponseJsonPathRegex('$.links.self', '/^http\:\/\/[^\/]+\/api\/users\/2$/');
+$I->seeResponseJsonPathSame('$.data.id', "2");
 $I->seeResponseJsonPathSame('$.data.type', "users");
 $I->seeResponseJsonPathType('$.data.attributes', 'array:!empty');
 
 $I->expect("should not create any new records");
-$I->assertSame(3, User::all()->count());
+$I->assertSame(2, User::all()->count());
 
-$I->expect("should update user one's name");
-$I->assertSame("AAABBBCCC", User::find(3)->name);
+$I->expect("should update user's first name");
+$I->assertSame("AAABBBCCC", User::find(2)->first_name);
 
 // ====================================================
 // delete user
 // ====================================================
 
 $I->comment("when we delete a user");
-$I->sendDELETE('/api/users/3');
+$I->sendDELETE('/api/users/2');
 
 $I->expect("should return 405 HTTP code");
 $I->seeResponseCodeIs(HttpCode::METHOD_NOT_ALLOWED);
@@ -156,4 +156,4 @@ $I->seeResponseJsonPathType('$.errors[*].detail', 'string:!empty');
 $I->seeResponseJsonPathType('$.errors[*].title', 'string:!empty');
 
 $I->expect("should not delete any records");
-$I->assertSame(3, User::all()->count());
+$I->assertSame(2, User::all()->count());

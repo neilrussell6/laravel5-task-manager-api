@@ -43,7 +43,7 @@ Route::group(['middleware' => [ 'api', 'jsonapi' ], 'namespace' => 'Api'], funct
 
         // primary resources
 
-        Route::resource('users', 'UsersController', ['except' => ['destroy', 'edit']]);
+        Route::resource('users', 'UsersController', ['except' => ['destroy', 'store', 'edit']]);
         Route::resource('tasks', 'TasksController', ['except' => ['edit']]);
         Route::resource('projects', 'ProjectsController', ['except' => ['edit']]);
 

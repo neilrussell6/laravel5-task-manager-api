@@ -2,18 +2,21 @@
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Kodeine\Acl\Traits\HasRole;
 use Neilrussell6\Laravel5JsonApi\Traits\Validatable;
 
 class User extends Authenticatable
 {
-    use Notifiable, Validatable;
+    use Notifiable, Validatable, HasRole;
 
-    protected $fillable     = ['name', 'email', 'password'];
+    protected $fillable     = ['username', 'first_name', 'last_name', 'email', 'password'];
     protected $hidden       = ['password', 'remember_token'];
 
     public $type = 'users';
     public $rules = [
-        'name' => 'required',
+        'username' => 'required',
+        'first_name' => 'required',
+        'last_name' => 'required',
         'email' => 'required|email|unique:users',
         'password' => 'required|min:6|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\X])(?=.*[!$#%]).*$/|confirmed',
     ];
