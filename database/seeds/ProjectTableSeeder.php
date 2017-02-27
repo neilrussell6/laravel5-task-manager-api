@@ -23,7 +23,7 @@ class ProjectTableSeeder extends Seeder
     public function run()
     {
         if (App::environment() === 'local') {
-            
+
             // a few projects for user 1
             $collection = factory(Project::class, $this->faker->numberBetween(2, 4))->create();
             $collection->each(function($project) {

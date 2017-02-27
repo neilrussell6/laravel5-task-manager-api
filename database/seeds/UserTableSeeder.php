@@ -20,6 +20,12 @@ class UserTableSeeder extends Seeder
             'password' => bcrypt(env('ADMIN_PASSWORD'))
         ]);
 
+        DB::table('users')->insert([
+            'name' => 'Demo',
+            'email' => env('DEMO_EMAIL'),
+            'password' => bcrypt(env('DEMO_PASSWORD'))
+        ]);
+
         if (App::environment() === 'local') {
             factory(User::class, 10)->create();
         }
