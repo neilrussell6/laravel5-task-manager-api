@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 
 class UserTableSeeder extends Seeder
@@ -18,6 +19,9 @@ class UserTableSeeder extends Seeder
             'email' => env('ADMIN_EMAIL'),
             'password' => bcrypt(env('ADMIN_PASSWORD'))
         ]);
-        factory(User::class, 10)->create();
+
+        if (App::environment() === 'local') {
+            factory(User::class, 10)->create();
+        }
     }
 }

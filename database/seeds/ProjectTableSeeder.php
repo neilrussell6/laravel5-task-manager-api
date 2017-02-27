@@ -4,6 +4,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Faker\Generator;
+use Illuminate\Support\Facades\App;
 
 class ProjectTableSeeder extends Seeder
 {
@@ -21,28 +22,31 @@ class ProjectTableSeeder extends Seeder
      */
     public function run()
     {
-        // a few projects for user 1
-        $collection = factory(Project::class, $this->faker->numberBetween(2, 4))->create();
-        $collection->each(function($project) {
-            $project->users()->attach(1);
-        });
+        if (App::environment() === 'local') {
+            
+            // a few projects for user 1
+            $collection = factory(Project::class, $this->faker->numberBetween(2, 4))->create();
+            $collection->each(function($project) {
+                $project->users()->attach(1);
+            });
 
-        // and a few projects for each of the other users
-        User::where('id', '!=', 1)->each(function($user) {
+            // and a few projects for each of the other users
+            User::where('id', '!=', 1)->each(function($user) {
 
-            $result = factory(Project::class, $this->faker->numberBetween(0, 3))->create();
+                $result = factory(Project::class, $this->faker->numberBetween(0, 3))->create();
 
-            // factory creating a single record (as might happen with numberBetween(0, n)) does not return a collection
-            // and calling ->each on that result will process all records of that type (why is this?)
-            // hense this precaution
+                // factory creating a single record (as might happen with numberBetween(0, n)) does not return a collection
+                // and calling ->each on that result will process all records of that type (why is this?)
+                // hense this precaution
 
-            if ($result instanceof \Illuminate\Support\Collection) {
-                $result->each(function($project) use ($user) {
-                    $project->users()->attach($user['id']);
-                });
-            } else {
-                $result->users()->attach($user['id']);
-            }
-        });
+                if ($result instanceof \Illuminate\Support\Collection) {
+                    $result->each(function($project) use ($user) {
+                        $project->users()->attach($user['id']);
+                    });
+                } else {
+                    $result->users()->attach($user['id']);
+                }
+            });
+        }
     }
 }
