@@ -43,17 +43,6 @@ Fixtures::add('task', [
     'data' => [
         'type' => 'tasks',
         'attributes' => [
-            'project_id' => 1,
-            'name' => "AAA"
-        ]
-    ]
-]);
-
-Fixtures::add('task', [
-    'data' => [
-        'type' => 'tasks',
-        'attributes' => [
-            'project_id' => 1,
             'name' => "AAA"
         ]
     ]

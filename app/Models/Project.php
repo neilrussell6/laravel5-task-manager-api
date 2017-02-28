@@ -1,11 +1,12 @@
 <?php namespace App\Models;
 
+use App\Traits\Ownable;
 use Illuminate\Database\Eloquent\Model;
 use Neilrussell6\Laravel5JsonApi\Traits\Validatable;
 
 class Project extends Model
 {
-    use Validatable;
+    use Validatable, Ownable;
     
     const STATUS_INCOMPLETE = 1;
     const STATUS_COMPLETE   = 2;
@@ -21,13 +22,8 @@ class Project extends Model
     public $rules = [
         'name' => 'required'
     ];
-    public $available_includes = ['editor', 'owner', 'tasks', 'users'];
-    public $default_includes = ['tasks'];
-
-    public function editors ()
-    {
-        return $this->belongsToMany('App\Models\User')->withPivot('is_editor')->wherePivot('is_editor', true);
-    }
+    public $available_includes = ['owner', 'tasks'];
+    public $default_includes = ['owner'];
 
     public function owner ()
     {
@@ -37,10 +33,5 @@ class Project extends Model
     public function tasks ()
     {
         return $this->hasMany('App\Models\Task');
-    }
-
-    public function users ()
-    {
-        return $this->belongsToMany('App\Models\User')->withPivot('is_editor');
     }
 }

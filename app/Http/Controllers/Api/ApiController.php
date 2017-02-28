@@ -22,7 +22,7 @@ class ApiController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function index (Request $request)
+    public function view (Request $request)
     {
         return response([
             'data' => []

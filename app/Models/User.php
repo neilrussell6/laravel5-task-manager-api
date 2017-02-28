@@ -23,13 +23,13 @@ class User extends Authenticatable
     public $available_includes = ['projects', 'tasks'];
     public $default_includes = ['projects'];
 
-    public function projects ($fields = [])
+    public function projects ()
     {
-        return $this->belongsToMany('App\Models\Project')->select($fields);
+        return $this->hasMany('App\Models\Project');
     }
 
-    public function tasks ($fields = [])
+    public function tasks ()
     {
-        return $this->belongsToMany('App\Models\Task')->select($fields);
+        return $this->hasMany('App\Models\Task');
     }
 }

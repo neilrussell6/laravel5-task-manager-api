@@ -20,7 +20,5 @@ class ProjectPolicy
 
     public function update(User $user, Project $project)
     {
-        var_dump("XXXX");die();
-        return $user->id === $project->user_id;
     }
 }
