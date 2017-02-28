@@ -24,8 +24,8 @@ Fixtures::add('user', [
             'first_name' => "BBB",
             'last_name' => "CCC",
             'email' => "AAA@BBB.CCC",
-            'password' => "Abc123!",
-            'password_confirmation' => "Abc123!"
+            'password' => "abcABC123!",
+            'password_confirmation' => "abcABC123!"
         ]
     ]
 ]);

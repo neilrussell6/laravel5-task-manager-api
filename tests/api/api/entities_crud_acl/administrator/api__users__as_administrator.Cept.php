@@ -19,37 +19,15 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$role = new Role();
-$role->create([
-    'name' => 'Administrator',
-    'slug' => RoleModel::ROLE_ADMINISTRATOR,
-    'description' => 'manage administration privileges'
-]);
-
-$role = new Role();
-$role->create([
-    'name' => 'Demo',
-    'slug' => RoleModel::ROLE_DEMO,
-    'description' => 'manage demo privileges'
-]);
-
-$role = new Role();
-$role->create([
-    'name' => 'Subscriber',
-    'slug' => RoleModel::ROLE_SUBSCRIBER,
-    'description' => 'manage subscriber privileges'
-]);
-
-// ----------------------------------------------------
-
-$email = "aaa@bbb.ccc";
 $password = "abcABC123!";
 
+// ----------------------------------------------------
+// admin
 // ----------------------------------------------------
 
 $I->comment("given 1 admin user");
 factory(User::class, 1)->create([
-    'email' => "aaa@bbb.ccc",
+    'email' => 'admin@bbb.ccc',
     'password' => Hash::make($password),
 ]);
 $user_admin_id = 1;
@@ -60,7 +38,7 @@ $user_admin->assignRole(RoleModel::ROLE_ADMINISTRATOR);
 
 $I->comment("given 1 demo user");
 factory(User::class, 1)->create([
-    'email' => "bbb@ccc.ddd",
+    'email' => "demo@abc.def",
     'password' => Hash::make($password),
 ]);
 $user_demo_id = 2;
@@ -98,8 +76,10 @@ $I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
 $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
-$credentials['data']['attributes']['email'] = $email;
-$credentials['data']['attributes']['password'] = $password;
+$credentials['data']['attributes'] = [
+    'email' => 'admin@bbb.ccc',
+    'password' => $password,
+];
 
 $I->sendPOST('/api/access_tokens', $credentials);
 $access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];
@@ -115,10 +95,10 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 // Endpoints
 //
 // * users.index
-// * users.store (not supported)
-// * users.update
-// * users.destroy (not supported)
 // * users.show
+// * users.store
+// * users.update
+// * users.destroy
 //
 ///////////////////////////////////////////////////////
 
@@ -165,18 +145,22 @@ $I->sendMultiple($requests, function($request) use ($I) {
 });
 
 // ====================================================
-// users.store (not supported)
+// users.store
 // ====================================================
 
 $I->comment("when we store a user");
 $user = Fixtures::get('user');
 $I->sendPOST('/api/users', $user);
 
-$I->expect("should return 405 HTTP code");
-$I->seeResponseCodeIs(HttpCode::METHOD_NOT_ALLOWED);
+$I->expect("should return 201 HTTP code");
+$I->seeResponseCodeIs(HttpCode::CREATED);
 
-$I->expect("should not create any records");
-$I->assertSame(6, User::all()->count());
+$I->expect("should return new user's id");
+$I->seeResponseJsonPathSame('$.data.type', 'users');
+$I->seeResponseJsonPathSame('$.data.id', '7');
+
+$new_user_1_id = $I->grabResponseJsonPath('$.data.id')[0];
+$new_user_1 = User::find($new_user_1_id);
 
 // ====================================================
 // users.update
@@ -212,17 +196,18 @@ $I->sendMultiple($requests, function($request) use ($I) {
 });
 
 // ====================================================
-// users.destroy (not supported)
+// users.destroy
 // ====================================================
 
-$I->comment("when we delete any user");
+$I->comment("when we delete any user (excluding our own)");
 $requests = [
-    [ 'DELETE', "/api/users/{$user_admin_id}" ],
+//    [ 'DELETE', "/api/users/{$user_admin_id}" ],
     [ 'DELETE', "/api/users/{$user_demo_id}" ],
     [ 'DELETE', "/api/users/{$user_subscriber_1_id}" ],
     [ 'DELETE', "/api/users/{$user_subscriber_2_id}" ],
     [ 'DELETE', "/api/users/{$user_public_1_id}" ],
     [ 'DELETE', "/api/users/{$user_public_2_id}" ],
+    [ 'DELETE', "/api/users/{$new_user_1_id}" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -231,10 +216,21 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     // ----------------------------------------------------
 
-    $I->expect("should return 405 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::METHOD_NOT_ALLOWED);
-
-    $I->expect("should not delete any records");
-    $I->assertSame(6, User::all()->count());
+    $I->expect("should return 204 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::NO_CONTENT);
 
 });
+
+$I->expect("should have deleted all users (expect our own)");
+$I->assertSame(1, User::all()->count());
+
+// ----------------------------------------------------
+
+$I->comment("when we delete our own user record");
+$I->sendDELETE("/api/users/{$user_admin_id}");
+
+$I->expect("should return 204 HTTP code");
+$I->seeResponseCodeIs(HttpCode::NO_CONTENT);
+
+$I->expect("should have deleted all users");
+$I->assertSame(0, User::all()->count());

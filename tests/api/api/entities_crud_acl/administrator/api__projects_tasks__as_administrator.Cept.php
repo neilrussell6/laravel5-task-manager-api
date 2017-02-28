@@ -21,30 +21,6 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$role = new Role();
-$role->create([
-    'name' => 'Administrator',
-    'slug' => RoleModel::ROLE_ADMINISTRATOR,
-    'description' => 'manage administration privileges'
-]);
-
-$role = new Role();
-$role->create([
-    'name' => 'Demo',
-    'slug' => RoleModel::ROLE_DEMO,
-    'description' => 'manage demo privileges'
-]);
-
-$role = new Role();
-$role->create([
-    'name' => 'Subscriber',
-    'slug' => RoleModel::ROLE_SUBSCRIBER,
-    'description' => 'manage subscriber privileges'
-]);
-
-// ----------------------------------------------------
-
-$email = "aaa@bbb.ccc";
 $password = "abcABC123!";
 
 // ----------------------------------------------------
@@ -53,7 +29,7 @@ $password = "abcABC123!";
 
 $I->comment("given 1 admin user");
 factory(User::class, 1)->create([
-    'email' => "aaa@bbb.ccc",
+    'email' => 'admin@bbb.ccc',
     'password' => Hash::make($password),
 ]);
 $user_admin_id = 1;
@@ -79,7 +55,7 @@ factory(Task::class, 2)->create(['user_id' => $user_admin_id, 'project_id' => $u
 
 $I->comment("given 1 demo user");
 factory(User::class, 1)->create([
-    'email' => "bbb@ccc.ddd",
+    'email' => "demo@abc.def",
     'password' => Hash::make($password),
 ]);
 $user_demo_id = 2;
@@ -162,8 +138,10 @@ $I->haveHttpHeader('Content-Type', 'application/vnd.api+json');
 $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
-$credentials['data']['attributes']['email'] = $email;
-$credentials['data']['attributes']['password'] = $password;
+$credentials['data']['attributes'] = [
+    'email' => 'admin@bbb.ccc',
+    'password' => $password,
+];
 
 $I->sendPOST('/api/access_tokens', $credentials);
 $access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];

@@ -1,6 +1,17 @@
 <?php
 
 return [
+    'acl' => [
+        'error_status_code' => [
+            'insufficient_permissions' => 403,
+        ],
+        'error_status_title' => [
+            'insufficient_permissions' => "Forbidden"
+        ],
+        'error_status_detail' => [
+            'insufficient_permissions' => "You are not authorized to access this resource.",
+        ],
+    ],
     'jwt' => [
         'error_status_code' => [
             'token_not_provided' => 401,

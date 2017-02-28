@@ -33,14 +33,4 @@ class Controller extends JsonApiController
             $this->model = new $model();
         }
     }
-
-//    public function update (Request $request, $id)
-//    {
-//        $user = Auth::user();
-//        $record = $this->model->find($id);
-//
-//        if ($user->can('update', $record)) {
-//            //
-//        }
-//    }
 }

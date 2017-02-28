@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Neilrussell6\Laravel5JsonApi\Facades\JsonApiUtils;

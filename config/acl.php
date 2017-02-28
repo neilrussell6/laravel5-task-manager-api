@@ -27,4 +27,8 @@ return [
      */
 		
     'cacheMinutes' => 1,
+
+//    'crud'       => [
+//        'resource' => [....],
+//    ],
 ];

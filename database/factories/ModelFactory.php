@@ -3,6 +3,7 @@
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,7 @@ $factory->define(User::class, function (Faker\Generator $faker) {
         'first_name' => $faker->firstName,
         'last_name' => $faker->lastName,
         'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = bcrypt('secret'),
+        'password' => Hash::make($password ?: 'abcABC123!'),
         'remember_token' => str_random(10),
     ];
 });

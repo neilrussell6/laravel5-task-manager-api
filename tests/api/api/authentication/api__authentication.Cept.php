@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Role;
 use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
+use Illuminate\Support\Facades\Hash;
 
 $I = new ApiTester($scenario);
 
@@ -16,14 +18,19 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$I->comment("given 1 user");
 $email = "aaa@bbb.ccc";
 $password = "abcABC123!";
+
+$I->comment("given 1 user");
 factory(User::class, 1)->create([
     'email' => $email,
-    'password' => \Illuminate\Support\Facades\Hash::make($password),
+    'password' => Hash::make($password),
 ]);
+
 $I->assertCount(1, User::all());
+
+$user_admin = User::find(1);
+$user_admin->assignRole(Role::ROLE_ADMINISTRATOR);
 
 // ====================================================
 // set headers

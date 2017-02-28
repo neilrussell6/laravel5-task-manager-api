@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class DatabaseSeeder extends Seeder
+class DatabaseTestingSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,9 +15,6 @@ class DatabaseSeeder extends Seeder
         Model::unguard();
 
         $this->call(ACLSeeder::class);
-        $this->call(UserTableSeeder::class);
-        $this->call(ProjectTableSeeder::class);
-        $this->call(TaskTableSeeder::class);
 
         Model::reguard();
     }
