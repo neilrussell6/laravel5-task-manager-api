@@ -15,10 +15,7 @@ extensions:
 modules:
     config:
         Db:
-#            dsn: sqlite:database/laravel5_task_manager_api_testing.sqlite
-#            user: ''
-#            password: ''
-#            dump: tests/_data/dump.sql
-#            populate: true
-#            cleanup: true
-#            reconnect: true
+            dsn:  ''
+            user: ''
+            password: ''
+            dump: tests/_data/dump.sql

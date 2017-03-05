@@ -14,7 +14,8 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(ACLSeeder::class);
+//        $this->call(LaratrustSeeder::class);
+        $this->call(JsonApiAclSeeder::class);
         $this->call(UserTableSeeder::class);
         $this->call(ProjectTableSeeder::class);
         $this->call(TaskTableSeeder::class);

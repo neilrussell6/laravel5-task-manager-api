@@ -28,6 +28,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+
     ];
 
     /**
@@ -42,9 +43,11 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'jsonapi' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\JsonApi::class,
         'jsonapi.jwt' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\TransformJWTResponse::class,
-        'jsonapi.acl' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\TransformACLResponse::class,
+//        'jsonapi.acl' => \Neilrussell6\Laravel5JsonApi\Http\Middleware\TransformACLResponse::class,
         'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
         'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
-        'acl' => \Kodeine\Acl\Middleware\HasPermission::class,
+        'role' => \Laratrust\Middleware\LaratrustRole::class,
+        'permission' => \Laratrust\Middleware\LaratrustPermission::class,
+        'ability' => \Laratrust\Middleware\LaratrustAbility::class,
     ];
 }

@@ -4,6 +4,7 @@ use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
 use App\Models\Project;
 use App\Models\Role;
+use App\Models\Task;
 use App\Models\User;
 
 $I = new ApiTester($scenario);
@@ -37,6 +38,12 @@ $user_admin->roles()->attach([ $user_admin->id ]);
 $I->comment("given 2 projects owned by admin user");
 $user_admin_projects = factory(Project::class, 2)->create(['user_id' => $user_admin->id]);
 
+// tasks
+
+$I->comment("given 2 tasks for each project owned by admin user");
+$user_admin_project_1_tasks = factory(Task::class, 2)->create(['user_id' => $user_admin->id, 'project_id' => $user_admin_projects[0]->id]);
+$user_admin_project_2_tasks = factory(Task::class, 2)->create(['user_id' => $user_admin->id, 'project_id' => $user_admin_projects[1]->id]);
+
 // ----------------------------------------------------
 // demo
 // ----------------------------------------------------
@@ -49,6 +56,12 @@ $user_demo->roles()->attach([ $demo_role->id ]);
 
 $I->comment("given 2 projects owned by demo user");
 $user_demo_projects = factory(Project::class, 2)->create(['user_id' => $user_demo->id]);
+
+// tasks
+
+$I->comment("given 2 tasks for each project owned by demo user");
+$user_demo_project_1_tasks = factory(Task::class, 2)->create(['user_id' => $user_demo->id, 'project_id' => $user_demo_projects[0]->id]);
+$user_demo_project_2_tasks = factory(Task::class, 2)->create(['user_id' => $user_demo->id, 'project_id' => $user_demo_projects[1]->id]);
 
 // ----------------------------------------------------
 // subscriber
@@ -65,6 +78,14 @@ $subscriber_users = factory(User::class, 2)->create()->map(function($user) use (
 $I->comment("given 2 projects owned by each subscriber user");
 $user_subscriber_1_projects = factory(Project::class, 2)->create(['user_id' => $subscriber_users[0]->id]);
 $user_subscriber_2_projects = factory(Project::class, 2)->create(['user_id' => $subscriber_users[1]->id]);
+
+// tasks
+
+$I->comment("given 2 tasks for each project owned by each subscriber user");
+$user_subscriber_1_project_1_tasks = factory(Task::class, 2)->create(['user_id' => $subscriber_users[0]->id, 'project_id' => $user_subscriber_1_projects[0]->id]);
+$user_subscriber_1_project_2_tasks = factory(Task::class, 2)->create(['user_id' => $subscriber_users[0]->id, 'project_id' => $user_subscriber_1_projects[1]->id]);
+$user_subscriber_2_project_1_tasks = factory(Task::class, 2)->create(['user_id' => $subscriber_users[1]->id, 'project_id' => $user_subscriber_2_projects[0]->id]);
+$user_subscriber_2_project_2_tasks = factory(Task::class, 2)->create(['user_id' => $subscriber_users[1]->id, 'project_id' => $user_subscriber_2_projects[1]->id]);
 
 // ----------------------------------------------------
 // public
@@ -85,6 +106,9 @@ $I->assertSame(6, User::all()->count());
 $I->expect("should be 8 projects");
 $I->assertSame(8, Project::all()->count());
 
+$I->expect("should be 16 tasks");
+$I->assertSame(16, Task::all()->count());
+
 // ====================================================
 // authenticate user and set headers
 // ====================================================
@@ -94,7 +118,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
 $credentials['data']['attributes'] = [
-    'email' => $user_admin->email,
+    'email' => $subscriber_users[0]->email,
     'password' => $password,
 ];
 
@@ -107,30 +131,25 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 //
 // Test
 //
-// * each user's projects as administrator
+// * project tasks as subscriber
 //
 // Endpoints
 //
-// * users.projects.index
-// * users.relationships.projects.index
+// * projects.tasks.index
+// * projects.relationships.tasks.index
 //
 ///////////////////////////////////////////////////////
 
 // ====================================================
-// users.projects.index
-// users.relationships.projects.index
+// projects.tasks.index
 // ====================================================
 
-$I->comment("when we index projects for all users (excluding public users)");
+$I->comment("when we index the tasks of any project we own");
 $requests = [
-    [ 'GET', "/api/users/{$user_admin->id}/projects", ],
-    [ 'GET', "/api/users/{$user_demo->id}/projects", ],
-    [ 'GET', "/api/users/{$subscriber_users[0]->id}/projects", ],
-    [ 'GET', "/api/users/{$subscriber_users[1]->id}/projects", ],
-    [ 'GET', "/api/users/{$user_admin->id}/relationships/projects", ],
-    [ 'GET', "/api/users/{$user_demo->id}/relationships/projects", ],
-    [ 'GET', "/api/users/{$subscriber_users[0]->id}/relationships/projects", ],
-    [ 'GET', "/api/users/{$subscriber_users[1]->id}/relationships/projects", ],
+    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/relationships/tasks" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -140,30 +159,42 @@ $I->sendMultiple($requests, function($request) use ($I) {
     $I->expect("should return 200 HTTP code");
     $I->seeResponseCodeIs(HttpCode::OK);
 
-    $I->expect("should return 2 projects");
+    $I->expect("should return 2 tasks");
     $I->assertCount(2, $I->grabResponseJsonPath('$.data[*]'));
-    $I->seeResponseJsonPathSame('$.data[*].type', 'projects');
+    $I->seeResponseJsonPathSame('$.data[*].type', 'tasks');
 
 });
 
 // ----------------------------------------------------
 
-$I->comment("when we index projects for all public users");
+$I->comment("when we index the tasks of any project that we don't own");
 $requests = [
-    [ 'GET', "/api/users/{$public_users[0]->id}/projects", ],
-    [ 'GET', "/api/users/{$public_users[1]->id}/projects", ],
-    [ 'GET', "/api/users/{$public_users[0]->id}/relationships/projects", ],
-    [ 'GET', "/api/users/{$public_users[1]->id}/relationships/projects", ],
+    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}/tasks" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/tasks" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}/tasks" ],
+    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}/relationships/tasks" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/relationships/tasks" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}/relationships/tasks" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}/relationships/tasks" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 200 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::OK);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 
-    $I->expect("should return no projects");
-    $I->assertCount(0, $I->grabResponseJsonPath('$.data[*]'));
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });

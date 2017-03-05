@@ -1,10 +1,8 @@
 <?php namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Laratrust\LaratrustRole;
 
-class Role extends Model
+class Role extends LaratrustRole
 {
-    const ROLE_ADMINISTRATOR = 'administrator';
-    const ROLE_DEMO = 'demo';
-    const ROLE_SUBSCRIBER = 'subscriber';
+    //
 }

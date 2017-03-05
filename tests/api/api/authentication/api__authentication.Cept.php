@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\Role;
-use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
+use App\Models\User;
 
 $I = new ApiTester($scenario);
 
@@ -18,19 +17,16 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$email = "aaa@bbb.ccc";
+$administrator_role = Role::where('name', '=', 'administrator')->first();
+
 $password = "abcABC123!";
 
-$I->comment("given 1 user");
-factory(User::class, 1)->create([
-    'email' => $email,
-    'password' => Hash::make($password),
-]);
+// admin
 
+$I->comment("given 1 admin user");
+$user_admin = factory(User::class)->create();
+$user_admin->roles()->attach([ $user_admin->id ]);
 $I->assertCount(1, User::all());
-
-$user_admin = User::find(1);
-$user_admin->assignRole(Role::ROLE_ADMINISTRATOR);
 
 // ====================================================
 // set headers
@@ -52,7 +48,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 // ====================================================
 
 $credentials = Fixtures::get('credentials');
-$credentials['data']['attributes']['email'] = $email;
+$credentials['data']['attributes']['email'] = $user_admin->email;
 $credentials['data']['attributes']['password'] = $password;
 
 $I->sendPOST('/api/access_tokens', $credentials);

@@ -2,34 +2,33 @@
 
 return [
     'acl' => [
-        'error_status_code' => [
-            'insufficient_permissions' => 403,
+        'check_access' => true, // overrides check_ownership & check_permission
+        'check_ownership' => true, // overrides use_role_hierarchy
+//        'check_ownership_method' => 'owns', // default: owns
+        'check_permission' => true, // will check for permissions that correspond to the route name (eg. users.show or tasks.relationships.project.show)
+//        'check_permission_method' => 'can', // default: can
+        'error_messages' => [
+            'status_code' => 403,
+            'title' => "Insufficient Permissions",
+            'detail' => [
+                'check_ownership_fail' => "User does not own target resource",
+                'check_permission_fail' => "User does not have permission to perform this action on the target resource",
+            ]
         ],
-        'error_status_title' => [
-            'insufficient_permissions' => "Forbidden"
-        ],
-        'error_status_detail' => [
-            'insufficient_permissions' => "You are not authorized to access this resource.",
-        ],
+        'acl_config' => 'laratrust',
+        'seeder_config' => 'laratrust_seeder',
+        'use_role_hierarchy' => true,
     ],
     'jwt' => [
-        'error_status_code' => [
-            'token_not_provided' => 401,
-            'token_expired' => 401,
-            'token_invalid' => 401,
-            'user_not_found' => 401,
-        ],
-        'error_title' => [
-            'token_not_provided' => "Unauthorised",
-            'token_expired' => "Unauthorised",
-            'token_invalid' => "Unauthorised",
-            'user_not_found' => "Unauthorised",
-        ],
-        'error_detail' => [
-            'token_not_provided' => "Access token not provided",
-            'token_expired' => "Access token is expired",
-            'token_invalid' => "Access token is invalid",
-            'user_not_found' => "No user for given access token",
+        'error_messages' => [
+            'status_code' => 401,
+            'title' => "Unauthorised",
+            'detail' => [
+                'token_not_provided' => "Access token not provided.",
+                'token_expired' => "Access token is expired.",
+                'token_invalid' => "Access token is invalid.",
+                'user_not_found' => "No user for given access token.",
+            ]
         ]
     ]
 ];

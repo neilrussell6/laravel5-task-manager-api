@@ -94,7 +94,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
 $credentials['data']['attributes'] = [
-    'email' => $user_admin->email,
+    'email' => $subscriber_users[0]->email,
     'password' => $password,
 ];
 
@@ -107,7 +107,7 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 //
 // Test
 //
-// * project owner as administrator
+// * project owner as subscriber
 //
 // Endpoints
 //
@@ -123,24 +123,10 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 // projects.relationships.owner.show
 // ====================================================
 
-$I->comment("when we view the owner of any user's project");
+$I->comment("when we view the owner of any project we own");
 $requests = [
-    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}/owner" ],
     [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/owner" ],
     [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}/owner" ],
-    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}/relationships/owner" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -155,11 +141,37 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
 });
 
+// ----------------------------------------------------
+
+$I->comment("when we view the owner of a project that we don't own");
+$requests = [
+    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}/owner" ],
+    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}/owner" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}/owner" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}/owner" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}/owner" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}/owner" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}/owner" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}/owner" ],
+];
+
+$I->sendMultiple($requests, function($request) use ($I) {
+
+    $I->comment("given we make a {$request[0]} request to {$request[1]}");
+
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
+
+});
+
 // ====================================================
 // projects.relationships.owner.update
 // ====================================================
 
-$I->comment("when we update any project's owner relationship");
+$I->comment("when we update the owner of any project, including those we own");
 $owner = [
     'data' => [
         'type' => 'users',
@@ -181,25 +193,22 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 204 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::NO_CONTENT);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 
-    $I->expect("should not return content");
-    $I->seeResponseEquals(null);
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
 
-$I->expect("should have updated the owner of all projects to demo user");
-$owners = Project::all()->map(function ($project) use ($user_demo) {
-    return $project->owner;
-})->toArray();
-$I->seeJsonPathSame($owners, '$[*].id', $user_demo->id);
+$I->expect("should not update the owner of any projects");
+// TODO: test
 
 // ====================================================
 // projects.relationships.owner.destroy
 // ====================================================
 
-$I->comment("when we delete any project's owner relationship");
+$I->comment("when we delete the owner of any project, including those we own");
 $requests = [
     [ 'DELETE', "/api/projects/{$user_admin_projects[0]->id}/relationships/owner" ],
     [ 'DELETE', "/api/projects/{$user_admin_projects[1]->id}/relationships/owner" ],
@@ -215,19 +224,16 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 204 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::NO_CONTENT);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 
-    $I->expect("should not return content");
-    $I->seeResponseEquals(null);
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
 
-$I->expect("should have dissociated the owner from all projects");
-$owners = Project::all()->map(function ($project) {
-    return $project->owner;
-})->toArray();
-$I->seeJsonPathSame($owners, '$[*]', null);
+$I->expect("should not update the owner of any projects");
+// TODO: test
 
 $I->expect("should not have deleted any owner records");
 $I->assertSame(6, User::all()->count());

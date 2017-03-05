@@ -2,12 +2,13 @@
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Kodeine\Acl\Traits\HasRole;
+use Laratrust\Contracts\Ownable;
 use Neilrussell6\Laravel5JsonApi\Traits\Validatable;
+use Laratrust\Traits\LaratrustUserTrait;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Ownable
 {
-    use Notifiable, Validatable, HasRole;
+    use Notifiable, Validatable, LaratrustUserTrait;
 
     protected $fillable     = ['username', 'first_name', 'last_name', 'email', 'password'];
     protected $hidden       = ['password', 'remember_token'];
@@ -22,6 +23,13 @@ class User extends Authenticatable
     ];
     public $available_includes = ['projects', 'tasks'];
     public $default_includes = ['projects'];
+    public $owner_key = 'id';
+
+
+    public function ownerKey()
+    {
+        return $this->id;
+    }
 
     public function projects ()
     {

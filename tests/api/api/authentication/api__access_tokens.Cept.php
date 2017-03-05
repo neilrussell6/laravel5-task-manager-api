@@ -1,9 +1,10 @@
 <?php
 
 use \Mockery as m;
-use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 $I = new ApiTester($scenario);
 
@@ -17,13 +18,10 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$I->comment("given 1 user");
-$email = "aaa@bbb.ccc";
 $password = "abcABC123!";
-factory(User::class, 1)->create([
-    'email' => $email,
-    'password' => \Illuminate\Support\Facades\Hash::make($password),
-]);
+
+$I->comment("given 1 user");
+$user = factory(User::class)->create();
 $I->assertCount(1, User::all());
 
 // ====================================================
@@ -46,7 +44,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 // ====================================================
 
 $credentials = Fixtures::get('credentials');
-$credentials['data']['attributes']['email'] = $email;
+$credentials['data']['attributes']['email'] = $user->email;
 $credentials['data']['attributes']['password'] = $password;
 
 $I->comment("when we create an access token");
@@ -63,10 +61,10 @@ $I->seeResponseJsonPathRegex('$.data.attributes.access_token', '/^[a-zA-Z0-9\-_]
 // create access token (wrong password)
 // ====================================================
 
-\Tymon\JWTAuth\Facades\JWTAuth::shouldReceive('attempt')->andReturn(false);
+JWTAuth::shouldReceive('attempt')->andReturn(false);
 
 $credentials = Fixtures::get('credentials');
-$credentials['data']['attributes']['email'] = $email;
+$credentials['data']['attributes']['email'] = $user->email;
 $credentials['data']['attributes']['password'] = "wrong password";
 
 $I->comment("when we create an access token with invalid credentials");

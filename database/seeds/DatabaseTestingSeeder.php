@@ -14,7 +14,8 @@ class DatabaseTestingSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(ACLSeeder::class);
+        $this->call(JsonApiAclSeeder::class);
+//        $this->call(LaratrustSeeder::class);
 
         Model::reguard();
     }

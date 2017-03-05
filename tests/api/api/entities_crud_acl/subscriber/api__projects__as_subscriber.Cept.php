@@ -94,7 +94,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
 $credentials['data']['attributes'] = [
-    'email' => $user_admin->email,
+    'email' => $subscriber_users[0]->email,
     'password' => $password,
 ];
 
@@ -107,7 +107,7 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 //
 // Test
 //
-// * projects as administrator
+// * projects as subscriber
 //
 // Endpoints
 //
@@ -130,24 +130,20 @@ $I->sendGET('/api/projects');
 $I->expect("should return 200 HTTP code");
 $I->seeResponseCodeIs(HttpCode::OK);
 
-$I->expect("should return all 8 projects");
-$I->assertCount(8, $I->grabResponseJsonPath('$.data[*]'));
+$I->expect("should only return projects we own");
+$I->assertCount(2, $I->grabResponseJsonPath('$.data[*]'));
 $I->seeResponseJsonPathSame('$.data[*].type', 'projects');
+$I->seeResponseJsonPathSame('$.data[0].id', "{$user_subscriber_1_projects[0]->id}");
+$I->seeResponseJsonPathSame('$.data[1].id', "{$user_subscriber_1_projects[1]->id}");
 
 // ====================================================
 // projects.show
 // ====================================================
 
-$I->comment("when we view any project (even those we don't own");
+$I->comment("when we view any project we own");
 $requests = [
-    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}" ],
-    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}" ],
-    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}" ],
     [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}" ],
     [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}" ],
-    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -159,6 +155,32 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->expect("should return requested project");
     $I->seeResponseJsonPathRegex('$.data.id', '/\d+/');
+
+});
+
+// ----------------------------------------------------
+
+$I->comment("when we view any project that we don't own");
+$requests = [
+    [ 'GET', "/api/projects/{$user_admin_projects[0]->id}" ],
+    [ 'GET', "/api/projects/{$user_admin_projects[1]->id}" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[0]->id}" ],
+    [ 'GET', "/api/projects/{$user_demo_projects[1]->id}" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[0]->id}" ],
+//    [ 'GET', "/api/projects/{$user_subscriber_1_projects[1]->id}" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[0]->id}" ],
+    [ 'GET', "/api/projects/{$user_subscriber_2_projects[1]->id}" ],
+];
+
+$I->sendMultiple($requests, function($request) use ($I) {
+
+    $I->comment("given we make a {$request[0]} request to {$request[1]}");
+
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
 
@@ -186,7 +208,7 @@ $I->seeResponseJsonPathType('$.data.relationships.owner', 'array:!empty');
 $I->expect("new project should belong to admin user");
 $new_project_1_id = intval($I->grabResponseJsonPath('$.data.id')[0]);
 $new_project_1 = Project::find($new_project_1_id);
-$I->assertSame($user_admin->id, $new_project_1->owner->id);
+$I->assertSame($subscriber_users[0]->id, $new_project_1->owner->id);
 
 //// ====================================================
 //// projects.store (with owner relationship)
@@ -205,30 +227,48 @@ $I->assertSame($user_admin->id, $new_project_1->owner->id);
 //];
 //$I->sendPOST('/api/projects', $project);
 //
-//$I->expect("should return 201 HTTP code");
-//$I->seeResponseCodeIs(HttpCode::CREATED);
+//$I->assertSame(9, Project::all()->count());
+//dd($I->grabResponseAsJson());;
 //
-//$I->expect("should return new project's id");
-//$I->seeResponseJsonPathSame('$.data.type', 'projects');
-//$I->seeResponseJsonPathSame('$.data.id', '10');
+//$I->expect("should return 403 HTTP code");
+//$I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 //
-//$I->expect("should return relationships, including owner");
-//$I->seeResponseJsonPathType('$.data.relationships.owner', 'array:!empty');
+//$I->expect("should return an errors array");
+//$I->seeResponseJsonPathType('$.errors', 'array:!empty');
 //
-//$I->expect("should create 1 new record");
-//$I->assertSame(10, Project::all()->count());
-//
-//$new_project_2_id = intval($I->grabResponseJsonPath('$.data.id')[0]);
-//$new_project_2 = Project::find($new_project_2_id);
-//
-//$I->expect("new project should belong to demo user");
-//$I->assertSame($user_demo->id, $new_project_2->owner->id);
+//$I->expect("should not create a new record");
+//$I->assertSame(9, Project::all()->count());
 
 // ====================================================
 // projects.update
 // ====================================================
 
-$I->comment("when we update any user's project (excluding public who can't have projects)");
+$I->comment("when we update any project we own");
+$project = [
+    'data' => [
+        'type' => 'projects',
+        'attributes' => [
+            'name' => "AAABBBCCC",
+        ]
+    ]
+];
+$requests = [
+    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[0]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[0]->id ] ]) ],
+    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[1]->id ] ]) ],
+];
+
+$I->sendMultiple($requests, function($request) use ($I) {
+
+    $I->comment("given we make a {$request[0]} request to {$request[1]}");
+
+    $I->expect("should return 200 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::OK);
+
+});
+
+// ----------------------------------------------------
+
+$I->comment("when we update any project that we don't own");
 $project = [
     'data' => [
         'type' => 'projects',
@@ -242,42 +282,33 @@ $requests = [
     [ 'PATCH', "/api/projects/{$user_admin_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_admin_projects[1]->id ] ]) ],
     [ 'PATCH', "/api/projects/{$user_demo_projects[0]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_demo_projects[0]->id ] ]) ],
     [ 'PATCH', "/api/projects/{$user_demo_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_demo_projects[1]->id ] ]) ],
-    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[0]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[0]->id ] ]) ],
-    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[1]->id ] ]) ],
+//    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[0]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[0]->id ] ]) ],
+//    [ 'PATCH', "/api/projects/{$user_subscriber_1_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_1_projects[1]->id ] ]) ],
     [ 'PATCH', "/api/projects/{$user_subscriber_2_projects[0]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_2_projects[0]->id ] ]) ],
     [ 'PATCH', "/api/projects/{$user_subscriber_2_projects[1]->id}", array_merge_recursive($project, [ 'data' => [ 'id' => $user_subscriber_2_projects[1]->id ] ]) ],
-    [ 'PATCH', "/api/projects/{$new_project_1_id}", array_merge_recursive($project, [ 'data' => [ 'id' => $new_project_1_id ] ]) ],
-//    [ 'PATCH', "/api/projects/{$new_project_2_id}", array_merge_recursive($project, [ 'data' => [ 'id' => $new_project_2_id ] ]) ],
 ];
 
-$I->sendMultiple($requests, function($request) use ($I, $user_admin_projects) {
+$I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 200 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::OK);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
-
-$I->expect("should have the updated the name of all projects");
-$I->seeJsonPathSame(Project::all()->toArray(), '$[*].name', "AAABBBCCC");
 
 // ====================================================
 // projects.destroy
 // ====================================================
 
-$I->comment("when we delete any user's project");
+$I->comment("when we delete any project we own");
 $requests = [
-    [ 'DELETE', "/api/projects/{$user_admin_projects[0]->id}" ],
-    [ 'DELETE', "/api/projects/{$user_admin_projects[1]->id}" ],
-    [ 'DELETE', "/api/projects/{$user_demo_projects[0]->id}" ],
-    [ 'DELETE', "/api/projects/{$user_demo_projects[1]->id}" ],
     [ 'DELETE', "/api/projects/{$user_subscriber_1_projects[0]->id}" ],
     [ 'DELETE', "/api/projects/{$user_subscriber_1_projects[1]->id}" ],
-    [ 'DELETE', "/api/projects/{$user_subscriber_2_projects[0]->id}" ],
-    [ 'DELETE', "/api/projects/{$user_subscriber_2_projects[1]->id}" ],
     [ 'DELETE', "/api/projects/{$new_project_1_id}" ],
-//    [ 'DELETE', "/api/projects/{$new_project_2_id}" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -289,10 +320,41 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->expect("should not return content");
     $I->seeResponseEquals(null);
+
 });
 
-$I->expect("should have deleted all projects");
-$I->assertSame(0, Project::all()->count());
+$I->expect("should have deleted 3 projects, leaving 6");
+$I->assertSame(6, Project::all()->count());
+$project_ids = array_column(Project::all()->toArray(), 'id');
+$I->assertNotContains($user_subscriber_1_projects[0]->id, $project_ids, "should have deleted subscriber 1 project 1");
+$I->assertNotContains($user_subscriber_1_projects[1]->id, $project_ids, "should have deleted subscriber 1 project 2");
+$I->assertNotContains($new_project_1_id, $project_ids, "should have deleted new project 1");
 
 $I->expect("should also delete all that project's tasks");
 // TODO: test
+
+// ----------------------------------------------------
+
+$I->comment("when we delete any project we do not own");
+$requests = [
+    [ 'DELETE', "/api/projects/{$user_admin_projects[0]->id}" ],
+    [ 'DELETE', "/api/projects/{$user_admin_projects[1]->id}" ],
+    [ 'DELETE', "/api/projects/{$user_demo_projects[0]->id}" ],
+    [ 'DELETE', "/api/projects/{$user_demo_projects[1]->id}" ],
+//    [ 'DELETE', "/api/projects/{$user_subscriber_1_projects[0]->id}" ],
+//    [ 'DELETE', "/api/projects/{$user_subscriber_1_projects[1]->id}" ],
+    [ 'DELETE', "/api/projects/{$user_subscriber_2_projects[0]->id}" ],
+    [ 'DELETE', "/api/projects/{$user_subscriber_2_projects[1]->id}" ],
+];
+
+$I->sendMultiple($requests, function($request) use ($I) {
+
+    $I->comment("given we make a {$request[0]} request to {$request[1]}");
+
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
+
+});

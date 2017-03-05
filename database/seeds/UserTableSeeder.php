@@ -15,7 +15,10 @@ class UserTableSeeder extends Seeder
      */
     public function run()
     {
-        // admin
+        $administrator_role = Role::where('name', '=', 'administrator')->first();
+        $subscriber_role = Role::where('name', '=', 'subscriber')->first();
+
+        // administrator
 
         DB::table('users')->insert([
             'username' => 'administrator',
@@ -25,29 +28,29 @@ class UserTableSeeder extends Seeder
             'password' => bcrypt(env('ADMIN_PASSWORD'))
         ]);
 
-        // demo
-
         $user_admin = User::find(DB::getPdo()->lastInsertId());
-        $user_admin->assignRole(Role::ROLE_ADMINISTRATOR);
+        $user_admin->roles()->attach([ $administrator_role->id ]);
 
-        DB::table('users')->insert([
-            'username' => 'demo',
-            'first_name' => env('DEMO_FIRST_NAME') ?: null,
-            'last_name' => env('DEMO_LAST_NAME') ?: null,
-            'email' => env('DEMO_EMAIL'),
-            'password' => bcrypt(env('DEMO_PASSWORD'))
-        ]);
-
-        $user_demo = User::find(DB::getPdo()->lastInsertId());
-        $user_demo->assignRole(Role::ROLE_DEMO);
+//        // demo
+//
+//        DB::table('users')->insert([
+//            'username' => 'demo',
+//            'first_name' => env('DEMO_FIRST_NAME') ?: null,
+//            'last_name' => env('DEMO_LAST_NAME') ?: null,
+//            'email' => env('DEMO_EMAIL'),
+//            'password' => bcrypt(env('DEMO_PASSWORD'))
+//        ]);
+//
+//        $user_demo = User::find(DB::getPdo()->lastInsertId());
+//        $user_demo->roles()->attach([ $subscriber_role->id ]);
 
         if (App::environment() === 'local') {
 
             // subscribers
 
             $collection = factory(User::class, 10)->create();
-            $collection->each(function($user) {
-                $user->assignRole(Role::ROLE_SUBSCRIBER);
+            $collection->each(function($user) use ($subscriber_role) {
+                $user->roles()->attach([ $subscriber_role->id ]);
             });
 
             // public (no role)

@@ -100,7 +100,7 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 
 $credentials = Fixtures::get('credentials');
 $credentials['data']['attributes'] = [
-    'email' => $user_admin->email,
+    'email' => $subscriber_users[0]->email,
     'password' => $password,
 ];
 
@@ -113,7 +113,7 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 //
 // Test
 //
-// * task owner as administrator
+// * task owner as subscriber
 //
 // Endpoints
 //
@@ -129,24 +129,10 @@ $I->haveHttpHeader('Authorization', "Bearer {$access_token}");
 // tasks.relationships.owner.show
 // ====================================================
 
-$I->comment("when we view the owner of any user's task");
+$I->comment("when we view the owner of any task we own");
 $requests = [
-    [ 'GET', "/api/tasks/{$user_admin_tasks[0]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_admin_tasks[1]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_demo_tasks[0]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_demo_tasks[1]->id}/owner" ],
     [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[0]->id}/owner" ],
     [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[1]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[0]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[1]->id}/owner" ],
-    [ 'GET', "/api/tasks/{$user_admin_tasks[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_admin_tasks[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_demo_tasks[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_demo_tasks[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[1]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[0]->id}/relationships/owner" ],
-    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[1]->id}/relationships/owner" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -161,15 +147,49 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
 });
 
+// ----------------------------------------------------
+
+$I->comment("when we view the owner of a task that we don't own");
+$requests = [
+    [ 'GET', "/api/tasks/{$user_admin_tasks[0]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_admin_tasks[1]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_demo_tasks[0]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_demo_tasks[1]->id}/owner" ],
+//    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[0]->id}/owner" ],
+//    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[1]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[0]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[1]->id}/owner" ],
+    [ 'GET', "/api/tasks/{$user_admin_tasks[0]->id}/relationships/owner" ],
+    [ 'GET', "/api/tasks/{$user_admin_tasks[1]->id}/relationships/owner" ],
+    [ 'GET', "/api/tasks/{$user_demo_tasks[0]->id}/relationships/owner" ],
+    [ 'GET', "/api/tasks/{$user_demo_tasks[1]->id}/relationships/owner" ],
+//    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[0]->id}/relationships/owner" ],
+//    [ 'GET', "/api/tasks/{$user_subscriber_1_tasks[1]->id}/relationships/owner" ],
+    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[0]->id}/relationships/owner" ],
+    [ 'GET', "/api/tasks/{$user_subscriber_2_tasks[1]->id}/relationships/owner" ],
+];
+
+$I->sendMultiple($requests, function($request) use ($I) {
+
+    $I->comment("given we make a {$request[0]} request to {$request[1]}");
+
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
+
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
+
+});
+
 // ====================================================
 // projects.relationships.owner.update
 // ====================================================
 
-$I->comment("when we update any task's owner relationship");
+$I->comment("when we update the owner of any task, including those we own");
 $owner = [
     'data' => [
         'type' => 'users',
-        'id' => $subscriber_users[0]->id,
+        'id' => $user_demo->id,
     ]
 ];
 $requests = [
@@ -187,25 +207,22 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 204 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::NO_CONTENT);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 
-    $I->expect("should not return content");
-    $I->seeResponseEquals(null);
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
 
-$I->expect("should have updated the owner of all tasks to subscriber user 1");
-$owners = Task::all()->map(function ($task) use ($user_demo) {
-    return $task->owner;
-})->toArray();
-$I->seeJsonPathSame($owners, '$[*].id', $subscriber_users[0]->id);
+$I->expect("should not update the owner of any tasks");
+// TODO: test
 
 // ====================================================
 // tasks.relationships.owner.destroy
 // ====================================================
 
-$I->comment("when we delete any task's owner relationship");
+$I->comment("when we delete the owner of any task, including those we own");
 $requests = [
     [ 'DELETE', "/api/tasks/{$user_admin_tasks[0]->id}/relationships/owner" ],
     [ 'DELETE', "/api/tasks/{$user_admin_tasks[1]->id}/relationships/owner" ],
@@ -221,19 +238,16 @@ $I->sendMultiple($requests, function($request) use ($I) {
 
     $I->comment("given we make a {$request[0]} request to {$request[1]}");
 
-    $I->expect("should return 204 HTTP code");
-    $I->seeResponseCodeIs(HttpCode::NO_CONTENT);
+    $I->expect("should return 403 HTTP code");
+    $I->seeResponseCodeIs(HttpCode::FORBIDDEN);
 
-    $I->expect("should not return content");
-    $I->seeResponseEquals(null);
+    $I->expect("should return an errors array");
+    $I->seeResponseJsonPathType('$.errors', 'array:!empty');
 
 });
 
-$I->expect("should have dissociated the owner from all tasks");
-$owners = Task::all()->map(function ($task) {
-    return $task->owner;
-})->toArray();
-$I->seeJsonPathSame($owners, '$[*]', null);
+$I->expect("should not update the owner of any tasks");
+// TODO: test
 
 $I->expect("should not have deleted any owner records");
 $I->assertSame(6, User::all()->count());

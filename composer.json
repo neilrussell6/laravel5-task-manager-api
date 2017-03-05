@@ -19,10 +19,10 @@
   "require": {
     "php": ">=5.6.4",
     "doctrine/dbal": "^2.5",
-    "kodeine/laravel-acl": "~1.0@dev",
     "laravel/framework": "5.4.*",
     "laravel/tinker": "~1.0",
     "neilrussell6/laravel5-json-api": "dev-master",
+    "santigarcor/laratrust": "3.2.*",
     "tymon/jwt-auth": "^0.5.10"
   },
   "require-dev": {

@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\User;
-use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
+use App\Models\Role;
+use App\Models\User;
 
 $I = new ApiTester($scenario);
 
@@ -16,9 +16,16 @@ $I = new ApiTester($scenario);
 // create data
 // ====================================================
 
-$I->comment("given 1 users");
-factory(User::class, 1)->create();
-$I->assertSame(1, User::all()->count());
+$administrator_role = Role::where('name', '=', 'administrator')->first();
+
+$password = "abcABC123!";
+
+// admin
+
+$I->comment("given 1 admin user");
+$user_admin = factory(User::class)->create();
+$user_admin->roles()->attach([ $user_admin->id ]);
+$I->assertCount(1, User::all());
 
 // ====================================================
 // set headers

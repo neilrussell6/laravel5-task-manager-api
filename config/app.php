@@ -180,7 +180,7 @@ return [
          * 3rd Party Packages Service Providers...
          */
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
-        Kodeine\Acl\AclServiceProvider::class,
+        Laratrust\LaratrustServiceProvider::class,
 
         /*
          * Neilrussell6 Packages Service Providers...
@@ -240,7 +240,7 @@ return [
          * 3rd Party Facades...
          */
         'JWTAuth' => \Tymon\JWTAuth\Facades\JWTAuth::class,
-        'JWTAuth' => \Tymon\JWTAuth\Facades\JWTFactory::class,
+        'JWTFactory' => \Tymon\JWTAuth\Facades\JWTFactory::class,
 
         /*
          * Neilrussell6 Facades...

@@ -1,4 +1,5 @@
 # codeception
+codeception.yml
 tests/_output/*
 tests/_support/_generated
 tests/api.suite.yml
