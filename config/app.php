@@ -181,6 +181,7 @@ return [
          */
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
         Laratrust\LaratrustServiceProvider::class,
+        Barryvdh\Cors\ServiceProvider::class,
 
         /*
          * Neilrussell6 Packages Service Providers...

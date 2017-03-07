@@ -18,6 +18,7 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=5.6.4",
+    "barryvdh/laravel-cors": "^0.8.6",
     "doctrine/dbal": "^2.5",
     "laravel/framework": "5.4.*",
     "laravel/tinker": "~1.0",
