@@ -199,43 +199,43 @@ $I->assertSame($user_admin->id, $new_task_1->owner->id);
 $I->expect("new task should belong to no project");
 $I->assertNull($new_task_1->project);
 
-//// ====================================================
-//// projects.store (with owner & project relationships)
-//// TODO: test once implemented
-//// ====================================================
-//
-//$I->comment("when we store a task and set the owner to demo user and the project to project 1");
-//$task = Fixtures::get('task');
-//$task['data']['relationships'] = [
-//    'owner' => [
-//        'data' => [
-//            'type' => 'users',
-//            'id' => $user_demo->id
-//        ]
-//    ],
-//    'project' => [
-//        'data' => [
-//            'type' => 'projects',
-//            'id' => $user_demo_projects[0]->id
-//        ]
-//    ]
-//];
-//$I->sendPOST('/api/tasks', $task);
-//$I->expect("should return relationships, including owner & project");
-//$I->seeResponseJsonPathType('$.data.relationships.owner', 'array:!empty');
-//$I->seeResponseJsonPathType('$.data.relationships.project', 'array:!empty');
-//
-//$I->expect("should create 1 new record");
-//$I->assertSame(10, Task::all()->count());
-//
-//$new_task_2_id = intval($I->grabResponseJsonPath('$.data.id')[0]);
-//$new_task_2 = Task::find($new_task_2_id);
-//
-//$I->expect("new task should belong to demo user (because it was explicitly set)");
-//$I->assertSame($user_demo->id, $new_task_2->owner->id);
-//
-//$I->expect("new task should belong to project 1 (because it was explicitly set)");
-//$I->assertSame($user_demo_projects[0]->id, $new_task_2->project->id);
+// ====================================================
+// projects.store (with owner & project relationships)
+// TODO: test once implemented
+// ====================================================
+
+$I->comment("when we store a task and set the owner to demo user and the project to project 1");
+$task = Fixtures::get('task');
+$task['data']['relationships'] = [
+    'owner' => [
+        'data' => [
+            'type' => 'users',
+            'id' => $user_demo->id
+        ]
+    ],
+    'project' => [
+        'data' => [
+            'type' => 'projects',
+            'id' => $user_demo_projects[0]->id
+        ]
+    ]
+];
+$I->sendPOST('/api/tasks', $task);
+$I->expect("should return relationships, including owner & project");
+$I->seeResponseJsonPathType('$.data.relationships.owner', 'array:!empty');
+$I->seeResponseJsonPathType('$.data.relationships.project', 'array:!empty');
+
+$I->expect("should create 1 new record");
+$I->assertSame(10, Task::all()->count());
+
+$new_task_2_id = intval($I->grabResponseJsonPath('$.data.id')[0]);
+$new_task_2 = Task::find($new_task_2_id);
+
+$I->expect("new task should belong to demo user (because it was explicitly set)");
+$I->assertSame($user_demo->id, $new_task_2->owner->id);
+
+$I->expect("new task should belong to project 1 (because it was explicitly set)");
+$I->assertSame($user_demo_projects[0]->id, $new_task_2->project->id);
 
 // ====================================================
 // tasks.update
@@ -260,7 +260,7 @@ $requests = [
     [ 'PATCH', "/api/tasks/{$user_subscriber_2_tasks[0]->id}", array_merge_recursive($task, [ 'data' => [ 'id' => $user_subscriber_2_tasks[0]->id ] ]) ],
     [ 'PATCH', "/api/tasks/{$user_subscriber_2_tasks[1]->id}", array_merge_recursive($task, [ 'data' => [ 'id' => $user_subscriber_2_tasks[1]->id ] ]) ],
     [ 'PATCH', "/api/tasks/{$new_task_1_id}", array_merge_recursive($task, [ 'data' => [ 'id' => $new_task_1_id ] ]) ],
-//    [ 'PATCH', "/api/tasks/{$new_task_2_id}", array_merge_recursive($task, [ 'data' => [ 'id' => $new_task_2_id ] ]) ],
+    [ 'PATCH', "/api/tasks/{$new_task_2_id}", array_merge_recursive($task, [ 'data' => [ 'id' => $new_task_2_id ] ]) ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
@@ -292,7 +292,7 @@ $requests = [
     [ 'DELETE', "/api/tasks/{$user_subscriber_2_tasks[0]->id}" ],
     [ 'DELETE', "/api/tasks/{$user_subscriber_2_tasks[1]->id}" ],
     [ 'DELETE', "/api/tasks/{$new_task_1_id}" ],
-//    [ 'DELETE', "/api/tasks/{$new_task_2_id}" ],
+    [ 'DELETE', "/api/tasks/{$new_task_2_id}" ],
 ];
 
 $I->sendMultiple($requests, function($request) use ($I) {
