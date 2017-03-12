@@ -31,18 +31,18 @@ class UserTableSeeder extends Seeder
         $user_admin = User::find(DB::getPdo()->lastInsertId());
         $user_admin->roles()->attach([ $administrator_role->id ]);
 
-//        // demo
-//
-//        DB::table('users')->insert([
-//            'username' => 'demo',
-//            'first_name' => env('DEMO_FIRST_NAME') ?: null,
-//            'last_name' => env('DEMO_LAST_NAME') ?: null,
-//            'email' => env('DEMO_EMAIL'),
-//            'password' => bcrypt(env('DEMO_PASSWORD'))
-//        ]);
-//
-//        $user_demo = User::find(DB::getPdo()->lastInsertId());
-//        $user_demo->roles()->attach([ $subscriber_role->id ]);
+        // demo
+
+        DB::table('users')->insert([
+            'username' => 'demo',
+            'first_name' => env('DEMO_FIRST_NAME') ?: null,
+            'last_name' => env('DEMO_LAST_NAME') ?: null,
+            'email' => env('DEMO_EMAIL'),
+            'password' => bcrypt(env('DEMO_PASSWORD'))
+        ]);
+
+        $user_demo = User::find(DB::getPdo()->lastInsertId());
+        $user_demo->roles()->attach([ $subscriber_role->id ]);
 
         if (App::environment() === 'local') {
 
