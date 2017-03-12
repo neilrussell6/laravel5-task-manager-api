@@ -16,6 +16,7 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         $administrator_role = Role::where('name', '=', 'administrator')->first();
+        $demo_role = Role::where('name', '=', 'demo')->first();
         $subscriber_role = Role::where('name', '=', 'subscriber')->first();
 
         // administrator
@@ -42,7 +43,7 @@ class UserTableSeeder extends Seeder
         ]);
 
         $user_demo = User::find(DB::getPdo()->lastInsertId());
-        $user_demo->roles()->attach([ $subscriber_role->id ]);
+        $user_demo->roles()->attach([ $demo_role->id ]);
 
         if (App::environment() === 'local') {
 

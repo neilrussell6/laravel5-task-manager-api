@@ -1185,12 +1185,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/neilrussell6/laravel5-json-api.git",
-                "reference": "d1cd1c3b315361500920b143e749a8374a3b9ca5"
+                "reference": "307a9ebb0b0af4df9b44064a83ae998109acedb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neilrussell6/laravel5-json-api/zipball/d1cd1c3b315361500920b143e749a8374a3b9ca5",
-                "reference": "d1cd1c3b315361500920b143e749a8374a3b9ca5",
+                "url": "https://api.github.com/repos/neilrussell6/laravel5-json-api/zipball/307a9ebb0b0af4df9b44064a83ae998109acedb1",
+                "reference": "307a9ebb0b0af4df9b44064a83ae998109acedb1",
                 "shasum": ""
             },
             "require": {
@@ -1225,7 +1225,7 @@
                 "laravel jsonapi",
                 "laravel rest api"
             ],
-            "time": "2017-02-26 18:40:10"
+            "time": "2017-03-12 12:06:06"
         },
         {
             "name": "nesbot/carbon",
