@@ -99,6 +99,7 @@ $credentials['data']['attributes'] = [
 ];
 
 $I->sendPOST('/api/access_tokens', $credentials);
+
 $access_token = $I->grabResponseJsonPath('$.data.attributes.access_token')[0];
 
 $I->haveHttpHeader('Authorization', "Bearer {$access_token}");

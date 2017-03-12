@@ -24,7 +24,7 @@ $factory->define(User::class, function (Faker\Generator $faker) {
         'first_name' => $faker->firstName,
         'last_name' => $faker->lastName,
         'email' => $faker->unique()->safeEmail,
-        'password' => Hash::make($password ?: 'abcABC123!'),
+        'password' => $password ?: 'abcABC123!',
         'remember_token' => str_random(10),
     ];
 });

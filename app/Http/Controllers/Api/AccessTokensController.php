@@ -31,6 +31,16 @@ class AccessTokensController extends Controller
     public function create (Request $request)
     {
         $request_data = $request->all();
+
+        if (!array_key_exists('password', $request_data['data']['attributes']) || (!array_key_exists('username', $request_data['data']['attributes']) && !array_key_exists('email', $request_data['data']['attributes']))) {
+            $error_code = 401;
+            $error_objects = JsonApiUtils::makeErrorObjects([[
+                'detail' => "Invalid credentials",
+                'title' => "Unauthorized",
+            ]], $error_code);
+            return Response::make([ 'errors' => $error_objects ], $error_code);
+        }
+
         $credentials = [
             'password' => $request_data['data']['attributes']['password']
         ];
