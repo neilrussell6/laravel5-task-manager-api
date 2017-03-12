@@ -33,6 +33,11 @@ Route::group(['middleware' => [ 'api', 'jsonapi' ], 'namespace' => 'Api'], funct
 
     Route::group(['middleware' => [ 'jsonapi.jwt', 'jwt.auth' ]], function () {
 
+        // access tokens
+    
+        Route::get('access_tokens/owner', [ 'as' => 'access_tokens.owner.show', 'uses' => 'AccessTokensController@showOwner' ]);
+        Route::get('access_tokens/relationships/owner', [ 'as' => 'access_tokens.relationships.owner.show', 'uses' => 'AccessTokensController@showOwner', 'is_minimal' => true ]);
+
         // projects
         Route::resource('projects', 'ProjectsController', ['except' => ['edit', 'create']]);
 

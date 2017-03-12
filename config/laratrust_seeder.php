@@ -3,6 +3,8 @@
 return [
     'role_structure' => [
         'administrator' => [
+            'access_tokens.owner' => 'r',
+            'access_tokens.relationships.owner' => 'r',
             'projects' => 'i,c,r,u,d',
             'projects.owner' => 'r',
             'projects.relationships.owner' => 'r,u,d',
@@ -20,6 +22,8 @@ return [
             'users.relationships.tasks' => 'i',
         ],
         'demo' => [
+            'access_tokens.owner' => 'r',
+            'access_tokens.relationships.owner' => 'r',
             'projects' => 'i,c,r,u,d',
             'projects.owner' => 'r',
             'projects.relationships.owner' => 'r',
@@ -37,6 +41,8 @@ return [
             'users.relationships.tasks' => 'i',
         ],
         'subscriber' => [
+            'access_tokens.owner' => 'r',
+            'access_tokens.relationships.owner' => 'r',
             'projects' => 'i,c,r,u,d',
             'projects.owner' => 'r',
             'projects.relationships.owner' => 'r',

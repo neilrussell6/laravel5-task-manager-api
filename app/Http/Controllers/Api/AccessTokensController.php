@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\Controller;
 use App\Models\Task;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Neilrussell6\Laravel5JsonApi\Facades\JsonApiAclUtils;
 use Neilrussell6\Laravel5JsonApi\Facades\JsonApiUtils;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -69,5 +72,29 @@ class AccessTokensController extends Controller
                 ]
             ]
         ], 201);
+    }
+
+    public function showOwner (Request $request)
+    {
+        // is minimal ? (return resource identifier object ie. only type and id)
+        $action         = $request->route()->getAction();
+        $is_minimal     = array_key_exists('is_minimal', $action) && $action['is_minimal'];
+
+        // get user associated with access token
+        $user                       = JWTAuth::parseToken()->toUser();
+        $related_data               = !is_null($user) ? $user->toArray() : null;
+        $related_model_class_name   = User::class;
+        $related_model              = new $related_model_class_name();
+        $include_resource_object_links = false;
+
+        // ACL
+        if (!is_null(config('jsonapi.acl.check_access')) && config('jsonapi.acl.check_access') !== false) {
+            $errors = JsonApiAclUtils::accessCheck($request->route()->getName(), $user, $user);
+            if (!empty($errors)) {
+                return Response::make([ 'errors' => $errors ], 403);
+            }
+        }
+
+        return Response::item($request, $related_data, $related_model, 200, $include_resource_object_links, $is_minimal);
     }
 }

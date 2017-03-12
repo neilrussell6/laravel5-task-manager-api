@@ -34,12 +34,12 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 //
 // Test
 //
-// * access tokens (exceptions)
+// * access_tokens.store (exceptions)
 //
 ///////////////////////////////////////////////////////
 
 // ====================================================
-// create access token (JWT Exception)
+// access_tokens.store (JWT Exception)
 // ====================================================
 
 \Tymon\JWTAuth\Facades\JWTAuth::shouldReceive('attempt')->andThrow(new \Tymon\JWTAuth\Exceptions\JWTException());

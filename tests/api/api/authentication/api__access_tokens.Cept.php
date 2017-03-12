@@ -35,12 +35,12 @@ $I->haveHttpHeader('Accept', 'application/vnd.api+json');
 //
 // Test
 //
-// * access tokens
+// * access_tokens.store
 //
 ///////////////////////////////////////////////////////
 
 // ====================================================
-// create access token (success)
+// access_tokens.store (success)
 // ====================================================
 
 $credentials = Fixtures::get('credentials');
@@ -58,7 +58,7 @@ $I->seeResponseJsonPathRegex('$.links.self', '/^http\:\/\/[^\/]+\/api\/access_to
 $I->seeResponseJsonPathRegex('$.data.attributes.access_token', '/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/');
 
 // ====================================================
-// create access token (wrong password)
+// access_tokens.store (wrong password)
 // ====================================================
 
 JWTAuth::shouldReceive('attempt')->andReturn(false);
