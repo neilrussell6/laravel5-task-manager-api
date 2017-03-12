@@ -2,6 +2,7 @@
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 use Laratrust\Contracts\Ownable;
 use Neilrussell6\Laravel5JsonApi\Traits\Validatable;
 use Laratrust\Traits\LaratrustUserTrait;
@@ -25,6 +26,10 @@ class User extends Authenticatable implements Ownable
     public $default_includes = ['projects'];
     public $owner_key = 'id';
 
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
 
     public function ownerKey()
     {

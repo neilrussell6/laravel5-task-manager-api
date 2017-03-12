@@ -4,7 +4,6 @@ use App\Models\Role;
 use App\Models\User;
 use Codeception\Util\Fixtures;
 use Codeception\Util\HttpCode;
-use Illuminate\Support\Facades\Hash;
 
 $I = new ApiTester($scenario);
 
