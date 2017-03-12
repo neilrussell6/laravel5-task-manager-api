@@ -33,9 +33,15 @@ class AccessTokensController extends Controller
     {
         $request_data = $request->all();
         $credentials = [
-            'email' => $request_data['data']['attributes']['email'],
-            'password' => $request_data['data']['attributes']['password'],
+            'password' => $request_data['data']['attributes']['password']
         ];
+
+        if (array_key_exists('username', $request_data['data']['attributes'])) {
+            $credentials['username'] = $request_data['data']['attributes']['username'];
+
+        } else if (array_key_exists('email', $request_data['data']['attributes'])) {
+            $credentials['email'] = $request_data['data']['attributes']['email'];
+        }
 
         // attempt to verify the credentials and create an access token for the user
         try {
