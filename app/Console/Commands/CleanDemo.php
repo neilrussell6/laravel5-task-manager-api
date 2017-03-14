@@ -48,6 +48,6 @@ class CleanDemo extends Command
         });
 
         // re-seed
-        Artisan::call('db:seed', ['--class' => 'DatabaseDemoSeeder']);
+        Artisan::call('db:seed', ['--class' => 'DatabaseDemoSeeder', '--force' => true]);
     }
 }
