@@ -25,6 +25,24 @@ class Project extends Model
     public $available_includes = ['owner', 'tasks'];
     public $default_includes = ['owner'];
 
+    // ----------------------------------------------------
+    // eloquent events
+    // ----------------------------------------------------
+
+    protected static function boot() {
+        parent::boot();
+
+        static::deleting(function($project) {
+            $project->tasks->each(function($task) {
+                $task->delete();
+            });
+        });
+    }
+
+    // ----------------------------------------------------
+    // relationships
+    // ----------------------------------------------------
+
     public function owner ()
     {
         return $this->belongsTo('App\Models\User', 'user_id'); // we would not need to provide a foreign key if the method was called 'user'

@@ -25,6 +25,10 @@ class Task extends Model
     public $available_includes = ['owner', 'project'];
     public $default_includes = ['owner', 'project'];
 
+    // ----------------------------------------------------
+    // relationships
+    // ----------------------------------------------------
+
     public function owner ()
     {
         return $this->belongsTo('App\Models\User', 'user_id'); // we would not need to provide a foreign key if the method was called 'user'

@@ -26,10 +26,19 @@ class User extends Authenticatable implements Ownable
     public $default_includes = ['projects'];
     public $owner_key = 'id';
 
+    // ----------------------------------------------------
+    // before updating attributes
+    // ----------------------------------------------------
+
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::make($value);
+        
     }
+
+    // ----------------------------------------------------
+    // relationships
+    // ----------------------------------------------------
 
     public function ownerKey()
     {

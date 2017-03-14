@@ -5,8 +5,7 @@ use Flow\JSONPath\JSONPath;
 
 class Api extends Module
 {
-    use CommonJsonPath;
-    use CommonCollection;
+    use CommonJsonPath, CommonCollection;
 
     //-----------------------------------
     // HTTP
