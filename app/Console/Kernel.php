@@ -1,6 +1,7 @@
 <?php namespace App\Console;
 
 use App\Console\Commands\CleanDemo;
+use App\Models\User;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -23,8 +24,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule (Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('demo:clean')
+            ->everyTenMinutes()
+            ->when(function() {
+                $demo_user = User::where('username', 'demo')->first();
+                $demo_project_count = $demo_user->projects->count();
+                $demo_task_count = $demo_user->tasks->count();
+
+                $default_demo_project_count = intval(getenv('DEFAULT_DEMO_PROJECT_COUNT'));
+                $default_demo_task_count = intval(getenv('DEFAULT_DEMO_TASK_PER_PROJECT_COUNT')) * $default_demo_project_count;
+
+                return $demo_project_count !== $default_demo_project_count || $demo_task_count !== $default_demo_task_count;
+            })
+            ->appendOutputTo(storage_path('logs/demo_clean.log'));
     }
 
     /**
