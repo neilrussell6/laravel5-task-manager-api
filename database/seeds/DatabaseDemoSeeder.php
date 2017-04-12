@@ -16,10 +16,10 @@ class DatabaseDemoSeeder extends Seeder
     {
         $demo_user = User::where('username', 'demo')->first();
 
-        // create 2 projects
+        // create projects
         $projects = factory(Project::class, intval(getenv('DEFAULT_DEMO_PROJECT_COUNT')))->create(['user_id' => $demo_user->id]);
 
-        // and create 5 tasks for each project
+        // and create tasks for each project
         $projects->each(function($project) use ($demo_user) {
             factory(Task::class, intval(getenv('DEFAULT_DEMO_TASK_PER_PROJECT_COUNT')))->create(['project_id' => $project['id'], 'user_id' => $demo_user->id]);
         });

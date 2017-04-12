@@ -24,8 +24,10 @@ class ProjectTableSeeder extends Seeder
     {
         if (App::environment() === 'local') {
 
-            // a few projects for each user
-            User::all()->each(function($user) {
+            $demo_user = User::where('username', 'demo')->first();
+
+            // a few projects for each user (excluding demo user)
+            User::where('id', '!=', $demo_user['id'])->each(function($user) use ($demo_user) {
                 factory(Project::class, $this->faker->numberBetween(1, 3))->create(['user_id' => $user['id']]);
             });
         }

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Response;
 use Neilrussell6\Laravel5JsonApi\Facades\JsonApiAclUtils;
 use Neilrussell6\Laravel5JsonApi\Facades\JsonApiUtils;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AccessTokensController extends Controller
@@ -47,7 +49,6 @@ class AccessTokensController extends Controller
 
         if (array_key_exists('username', $request_data['data']['attributes'])) {
             $credentials['username'] = $request_data['data']['attributes']['username'];
-
         } else if (array_key_exists('email', $request_data['data']['attributes'])) {
             $credentials['email'] = $request_data['data']['attributes']['email'];
         }
@@ -101,6 +102,18 @@ class AccessTokensController extends Controller
         $related_model_class_name   = User::class;
         $related_model              = new $related_model_class_name();
         $include_resource_object_links = false;
+
+//        try {
+//            if (! $user = JWTAuth::parseToken()->authenticate()) {
+//                dd('user_not_found');
+//            }
+//        } catch (TokenExpiredException $e) {
+//            dd('token_expired');
+//        } catch (TokenInvalidException $e) {
+//            dd('token_invalid');
+//        } catch (JWTException $e) {
+//            dd('token_absent');
+//        }
 
         // ACL
         if (!is_null(config('jsonapi.acl.check_access')) && config('jsonapi.acl.check_access') !== false) {

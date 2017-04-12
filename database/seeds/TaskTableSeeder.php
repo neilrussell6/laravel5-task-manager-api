@@ -24,13 +24,16 @@ class TaskTableSeeder extends Seeder
     {
         if (App::environment() === 'local') {
 
-            // a few tasks for each of user 1's projects
-            User::find(1)->projects()->get()->each(function($project) {
+            $admin_user = User::where('username', 'administrator')->first();
+            $demo_user = User::where('username', 'demo')->first();
+
+            // a few tasks for each of admin user's projects
+            User::find($admin_user['id'])->projects()->get()->each(function($project) {
                 factory(Task::class, $this->faker->numberBetween(5, 10))->create(['project_id' => $project['id'], 'user_id' => 1]);
             });
 
-            // and a few tasks for each of the other user's projects
-            User::where('id', '!=', 1)->each(function($user) {
+            // and a few tasks for each of the other user's projects (excluding demo user)
+            User::where('id', '!=', [ $admin_user['id'], $demo_user['id'] ])->each(function($user) {
                 $user->projects()->get()->each(function($project) use ($user) {
                     factory(Task::class, $this->faker->numberBetween(2, 5))->create(['project_id' => $project['id'], 'user_id' => $user['id']]);
                 });
